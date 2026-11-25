@@ -2,7 +2,7 @@
   "_lisezMoi": "FICHIER UNIQUE À MODIFIER. Horaires au format HH:MM. Les champs marqués 'A_CONFIRMER' sont à valider avec le client avant mise en ligne.",
 
   "site": {
-    "url": "https://www.montcafe-avranches.fr",
+    "url": "https://montcafe-avranches.netlify.app",
     "titre": "MontCafé – Torréfacteur artisanal à Avranches",
     "description": "MontCafé, torréfaction artisanale à Avranches (Manche). Cafés de spécialité en grains ou moulus, torréfiés sur place place Saint-Aubert. Dégustation en boutique.",
     "langue": "fr"

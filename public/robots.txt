@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.montcafe-avranches.fr/sitemap-index.xml
+Sitemap: https://montcafe-avranches.netlify.app/sitemap-index.xml
