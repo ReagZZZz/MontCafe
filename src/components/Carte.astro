@@ -2,9 +2,11 @@
 // Nos cafés : onglets en CSS pur (boutons radio), zéro JavaScript.
 // Chaque café affiche son niveau de torréfaction sur l'échelle de la marque.
 import data from '../data/data.json';
-const { titre, intro, categories } = data.carte;
+import { cafes } from '../lib/boutique.js';
+const titre = 'Nos cafés du moment';
+const { intro, categories } = cafes;
 const services = data.services;
-const prixVisible = (p) => p && p !== 'A_CONFIRMER'; // un prix non validé n'est pas affiché
+const prixVisible = (p) => p && p !== 'A_CONFIRMER'; // prix vide = non affiché
 const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Foncée'];
 ---
 <section class="section cafes" id="cafes" aria-labelledby="titre-cafes">
@@ -36,7 +38,7 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
                   {p.notes.map((n) => <li>{n}</li>)}
                 </ul>
               )}
-              {p.torrefaction && (
+              {p.torrefaction > 0 && (
                 <div class="cafe__torref">
                   <div class="echelle" role="img" aria-label={`Torréfaction ${NIVEAUX[p.torrefaction].toLowerCase()}, ${p.torrefaction} sur 5`}>
                     {[1, 2, 3, 4, 5].map((n) => <i class={n <= p.torrefaction ? 'on' : ''}></i>)}

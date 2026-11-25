@@ -4,6 +4,7 @@ import data from '../data/data.json';
 import { hFr } from '../lib/horaires.js';
 import { liens } from '../lib/liens.js';
 import Icone from './Icone.astro';
+import { horaires } from '../lib/boutique.js';
 
 const c = data.commerce;
 const { itineraire, appel, embed } = liens(c);
@@ -16,7 +17,7 @@ const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
       <p class="statut" data-statut></p>
       <table class="horaires">
         <tbody>
-          {data.horaires.map(({ jour, creneaux }) => (
+          {horaires.map(({ jour, creneaux }) => (
             <tr data-jour={jour} class={creneaux.length ? '' : 'ferme'}>
               <th scope="row">{jour}</th>
               <td>{creneaux.length ? creneaux.map(([a, b]) => <span class="creneau">{hFr(a)} – {hFr(b)}</span>) : 'Fermé'}</td>

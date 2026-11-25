@@ -1,9 +1,9 @@
 ---
 // Mini-script (≈1 Ko) : "Ouvert jusqu'à 19h" / "Fermé · ouvre mardi à 10h"
 // + surligne le jour courant dans le tableau. Heure calculée en Europe/Paris.
-import data from '../data/data.json';
+import { horaires } from '../lib/boutique.js';
 ---
-<script is:inline define:vars={{ horaires: data.horaires }}>
+<script is:inline define:vars={{ horaires }}>
   (() => {
     const hFr = (h) => h.replace(/^0/, '').replace(':00', 'h').replace(':', 'h');
     const min = (h) => { const [a, b] = h.split(':'); return a * 60 + +b; };

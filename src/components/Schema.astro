@@ -3,6 +3,7 @@
 // Type double : CafeOrCoffeeShop + Store, car MontCafé torréfie ET vend des grains.
 import data from '../data/data.json';
 import { horairesSchema } from '../lib/horaires.js';
+import { horaires } from '../lib/boutique.js';
 
 const c = data.commerce;
 const sameAs = Object.values(c.reseaux).filter(Boolean);
@@ -29,7 +30,7 @@ const schema = {
   geo: { '@type': 'GeoCoordinates', latitude: c.gps.lat, longitude: c.gps.lng },
   hasMap: `https://www.google.com/maps/place/?q=place_id:${c.googlePlaceId}`,
   areaServed: [c.ville, 'Baie du Mont-Saint-Michel', 'Manche'],
-  openingHoursSpecification: horairesSchema(data.horaires),
+  openingHoursSpecification: horairesSchema(horaires),
   ...(sameAs.length ? { sameAs } : {}),
 };
 ---
