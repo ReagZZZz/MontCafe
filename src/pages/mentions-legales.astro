@@ -9,7 +9,7 @@ const ok = (v) => v && !String(v).startsWith('A_CONFIRMER');
 ---
 <Base titre={`Mentions légales – ${c.nom}`} description={`Mentions légales du site ${c.nom}, ${c.ville}.`} noindex>
   <main class="conteneur legal">
-    <p><a href="/">← Retour à l'accueil</a></p>
+    <p><a href={import.meta.env.BASE_URL}>← Retour à l'accueil</a></p>
     <h1>Mentions légales</h1>
 
     <h2>Éditeur du site</h2>
