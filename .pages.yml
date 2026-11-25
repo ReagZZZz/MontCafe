@@ -1,0 +1,138 @@
+# Espace d'administration MontCafé (Pages CMS : https://app.pagescms.org)
+# Seuls les 3 fichiers de src/data/boutique/ sont modifiables.
+# Mentions légales, SEO et coordonnées (src/data/data.json) restent hors de portée.
+
+content:
+  # ---------- Annonce ----------
+  - name: annonce
+    label: Annonce en haut du site
+    type: file
+    path: src/data/boutique/annonce.json
+    format: json
+    fields:
+      - name: actif
+        label: Afficher l'annonce
+        type: boolean
+      - name: ton
+        label: Type
+        type: select
+        options:
+          values:
+            - { name: nouveaute, label: "Nouveauté (vert)" }
+            - { name: info, label: "Information (sable)" }
+            - { name: fermeture, label: "Fermeture (rouge)" }
+      - name: texte
+        label: Texte
+        type: string
+        description: "Une phrase courte. Ex : Arrivage Kenya cette semaine !"
+
+  # ---------- Cafés ----------
+  - name: cafes
+    label: Cafés du moment
+    type: file
+    path: src/data/boutique/cafes.json
+    format: json
+    fields:
+      - name: intro
+        label: Phrase d'introduction
+        type: text
+      - name: categories
+        label: Rayons
+        type: object
+        list:
+          collapsible: { collapsed: true, summary: "{nom}" }
+        fields:
+          - name: nom
+            label: "Nom du rayon (ex : Origines)"
+            type: string
+            required: true
+          - name: produits
+            label: Cafés
+            type: object
+            list:
+              collapsible: { collapsed: true, summary: "{nom}" }
+            fields:
+              - name: nom
+                label: Nom du café
+                type: string
+                required: true
+              - name: disponible
+                label: En rayon
+                type: boolean
+                description: "Décocher pour masquer un café épuisé sans le supprimer."
+              - name: origine
+                label: Origine ou région
+                type: string
+              - name: notes
+                label: Arômes
+                type: string
+                list: { max: 4 }
+                description: "Un arôme par ligne, 2 ou 3 suffisent. Ex : chocolat"
+              - name: torrefaction
+                label: Torréfaction
+                type: select
+                options:
+                  values:
+                    - { name: "1", label: "1 – Très claire" }
+                    - { name: "2", label: "2 – Claire" }
+                    - { name: "3", label: "3 – Médium" }
+                    - { name: "4", label: "4 – Médium foncée" }
+                    - { name: "5", label: "5 – Foncée" }
+              - name: prix
+                label: "Prix (ex : 9,50 €)"
+                type: string
+                description: "Laisser vide pour ne pas afficher de prix."
+              - name: format
+                label: "Format (ex : 250 g)"
+                type: string
+
+  # ---------- Horaires ----------
+  - name: horaires
+    label: Horaires d'ouverture
+    type: file
+    path: src/data/boutique/horaires.json
+    format: json
+    fields:
+      - name: lundi
+        label: Lundi
+        type: string
+        description: "Format : 10:00-12:30, 13:30-19:00. Vide = fermé. Fermeture ponctuelle : utilisez l'annonce."
+        pattern:
+          regex: '^$|^\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*(,\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*)*$'
+          message: "Format attendu : 10:00-12:30, 13:30-19:00"
+      - name: mardi
+        label: Mardi
+        type: string
+        pattern:
+          regex: '^$|^\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*(,\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*)*$'
+          message: "Format attendu : 10:00-12:30, 13:30-19:00"
+      - name: mercredi
+        label: Mercredi
+        type: string
+        pattern:
+          regex: '^$|^\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*(,\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*)*$'
+          message: "Format attendu : 10:00-12:30, 13:30-19:00"
+      - name: jeudi
+        label: Jeudi
+        type: string
+        pattern:
+          regex: '^$|^\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*(,\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*)*$'
+          message: "Format attendu : 10:00-12:30, 13:30-19:00"
+      - name: vendredi
+        label: Vendredi
+        type: string
+        pattern:
+          regex: '^$|^\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*(,\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*)*$'
+          message: "Format attendu : 10:00-12:30, 13:30-19:00"
+      - name: samedi
+        label: Samedi
+        type: string
+        pattern:
+          regex: '^$|^\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*(,\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*)*$'
+          message: "Format attendu : 10:00-12:30, 13:30-19:00"
+      - name: dimanche
+        label: Dimanche
+        type: string
+        pattern:
+          regex: '^$|^\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*(,\s*\d{1,2}[:hH]?\d{0,2}\s*-\s*\d{1,2}[:hH]?\d{0,2}\s*)*$'
+          message: "Format attendu : 10:00-12:30, 13:30-19:00"

@@ -30,12 +30,12 @@ src/pages/mentions-legales.astro
 - E-mail, n° TVA intracom, comptes Instagram/Facebook, vraie photo, nom de domaine (data.json > site.url + public/robots.txt).
 
 ## Espace admin (Laurent)
-Adresse : `/admin/` (ex : https://reagzzzz.github.io/MontCafe/admin/) — outil Sveltia CMS, sans serveur.
-Laurent y modifie : l'annonce du bandeau, les cafés du moment (avec « En rayon » pour masquer un café épuisé) et les horaires.
-Ces données sont dans `src/data/boutique/*.json` ; le reste de `data.json` n'est pas accessible depuis l'admin.
+Outil : Pages CMS (https://app.pagescms.org), configuré par `.pages.yml` à la racine. `/admin/` redirige vers lui.
+Laurent y modifie : l'annonce du bandeau, les cafés du moment (« En rayon » pour masquer un café épuisé) et les horaires.
+Ces données sont dans `src/data/boutique/*.json` ; `data.json` (mentions légales, SEO, coordonnées) n'est pas exposé.
+Chaque enregistrement crée un commit sur `main` → le workflow republie le site en ~1 minute.
 
-Mise en place (une fois) :
-1. Laurent crée un compte GitHub gratuit ; tu l'ajoutes au dépôt (Settings > Collaborators, rôle Write).
-2. Sur son téléphone : ouvrir /admin/ > « Sign In Using Access Token » > suivre le lien vers GitHub
-   (jeton « fine-grained », dépôt MontCafe uniquement, permission Contents : Read and write) > coller le jeton.
-3. Le jeton reste mémorisé sur le téléphone. Chaque « Save » publie le site en ~1 minute.
+Mise en place (Paul, une fois) :
+1. app.pagescms.org > se connecter avec GitHub > installer l'appli GitHub sur le dépôt MontCafe.
+2. Ouvrir le dépôt dans Pages CMS > Collaborateurs > inviter l'e-mail de Laurent.
+3. Laurent reçoit un e-mail et se connecte avec ce même e-mail : pas de compte GitHub.
