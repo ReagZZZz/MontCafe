@@ -6,13 +6,16 @@ const annee = new Date().getFullYear();
 ---
 <footer class="pied">
   <div class="conteneur">
-    <p><strong>{c.nom}</strong> · {c.activite} · {c.adresse.rue}, {c.adresse.codePostal} {c.adresse.ville} · <a href={`tel:${c.telephone}`}>{c.telephoneAffiche}</a></p>
-    <p>© {annee} {c.nom} · <a href={`${import.meta.env.BASE_URL}mentions-legales/`}>Mentions légales</a></p>
+    <p class="pied__nom">{c.nom}</p>
+    <p>{c.activite}, {c.adresse.rue}, {c.adresse.codePostal} {c.adresse.ville}<br /><a href={`tel:${c.telephone}`}>{c.telephoneAffiche}</a></p>
+    <p class="pied__bas">© {annee} {c.nom}. <a href={`${import.meta.env.BASE_URL}mentions-legales/`}>Mentions légales</a></p>
   </div>
 </footer>
 
 <style>
-  .pied { background: var(--brun-fonce); color: rgb(250 245 239 / .75); font-size: .88rem; padding: 28px 0; text-align: center; }
-  .pied p { margin: .4em 0; }
-  .pied a { color: var(--caramel-clair); }
+  .pied { background: var(--torref); color: #e9ebe6b3; padding: 8px 0 32px; border-top: 1px solid #e9ebe621; }
+  .pied p { margin-top: 10px; }
+  .pied__nom { font-size: 3rem; font-weight: 800; font-variation-settings: "wdth" 75; letter-spacing: -0.04em; color: var(--brume); line-height: 1; padding-top: 24px; }
+  .pied a { color: var(--t2); }
+  .pied__bas { font-size: .88rem; }
 </style>

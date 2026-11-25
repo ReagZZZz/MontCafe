@@ -1,0 +1,22 @@
+---
+// Bandeau avis Google : note réelle + lien vers les avis (on ne recopie pas d'avis)
+import data from '../data/data.json';
+const { note, nombre, lien } = data.avis;
+const noteFr = note.toFixed(1).replace('.', ',');
+---
+<section class="avis" aria-label="Avis clients">
+  <div class="conteneur avis__ligne">
+    <p class="avis__note"><span class="etoiles" aria-hidden="true">★★★★★</span> {noteFr} sur 5</p>
+    <p>Note moyenne sur {nombre} avis Google</p>
+    <a href={lien} target="_blank" rel="noopener">Lire les avis</a>
+  </div>
+</section>
+
+<style>
+  .avis { background: var(--baie); color: var(--brume); padding: 26px 0; }
+  .avis__ligne { display: grid; gap: 4px; }
+  .avis__note { font-size: 1.6rem; font-weight: 700; font-variation-settings: "wdth" 85; }
+  .etoiles { color: var(--t2); letter-spacing: 2px; }
+  .avis a { font-weight: 600; margin-top: 6px; min-height: 40px; display: inline-flex; align-items: center; }
+  @media (min-width: 768px) { .avis__ligne { grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; } .avis a { margin: 0; } }
+</style>

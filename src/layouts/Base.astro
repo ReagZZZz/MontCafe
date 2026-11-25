@@ -1,5 +1,6 @@
 ---
 // Layout commun : <head> SEO complet (meta, Open Graph, canonical) + styles globaux
+import '@fontsource-variable/bricolage-grotesque/wdth.css'; // police auto-hébergée (aucun appel à Google Fonts)
 import '../styles/global.css';
 import data from '../data/data.json';
 
@@ -16,7 +17,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, follow" />}
-    <meta name="theme-color" content="#3b2418" />
+    <meta name="theme-color" content="#e9ebe6" />
     <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
 
     <!-- Géolocalisation (SEO local) -->

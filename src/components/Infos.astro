@@ -9,11 +9,10 @@ const c = data.commerce;
 const { itineraire, appel, embed } = liens(c);
 const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
 ---
-<section class="section section--sombre" id="infos" aria-labelledby="titre-infos">
+<section class="section infos" id="infos" aria-labelledby="titre-infos">
   <div class="conteneur grille">
     <div>
-      <p class="surtitre">Infos pratiques</p>
-      <h2 id="titre-infos">Horaires d'ouverture</h2>
+            <h2 id="titre-infos">Quand passer</h2>
       <p class="statut" data-statut></p>
       <table class="horaires">
         <tbody>
@@ -28,7 +27,7 @@ const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
     </div>
 
     <div>
-      <h2>Nous trouver</h2>
+      <h2>Où nous trouver</h2>
       <address>
         <strong>{c.nom}</strong><br />
         {c.adresse.rue}<br />
@@ -38,7 +37,7 @@ const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
 
       <!-- Carte "façade" : l'iframe Google Maps (~500 Ko) n'est chargée qu'au clic -->
       <div class="carte" data-embed={embed}>
-        <button type="button" class="btn btn--plein" data-charger-carte>
+        <button type="button" class="btn" data-charger-carte>
           <Icone nom="carte" />Afficher la carte
         </button>
       </div>
@@ -67,26 +66,33 @@ const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
 </script>
 
 <style>
-  .grille { display: grid; gap: 48px; }
-  .horaires { width: 100%; border-collapse: collapse; margin-top: 12px; }
-  .horaires th, .horaires td { padding: 12px 0; border-bottom: 1px solid rgb(250 245 239 / .12); text-align: left; }
-  .horaires th { text-transform: capitalize; font-weight: 600; width: 38%; }
+  .infos { background: var(--torref); color: var(--brume); }
+  .infos h2 { color: var(--brume); }
+  .grille { display: grid; gap: 56px; }
+  .infos .statut { background: #e9ebe61a; margin-top: 18px; }
+  .horaires { width: 100%; border-collapse: collapse; margin-top: 18px; }
+  .horaires th, .horaires td { padding: 13px 0; border-bottom: 1px solid #e9ebe621; text-align: left; vertical-align: top; }
+  .horaires th { text-transform: capitalize; font-weight: 600; width: 40%; }
   .horaires td { text-align: right; font-variant-numeric: tabular-nums; }
-  .horaires tr.ferme td { opacity: .55; }
-  .horaires tr.aujourdhui { color: var(--caramel-clair); }
-  .horaires tr.aujourdhui th::after { content: " · aujourd'hui"; font-weight: 400; font-size: .85em; text-transform: none; }
   .creneau { display: block; }
-  address { font-style: normal; margin-bottom: 20px; line-height: 1.7; }
-  address a { color: var(--caramel-clair); font-weight: 700; }
+  .horaires tr.ferme td { color: #e9ebe680; }
+  .horaires tr.aujourdhui { color: var(--t2); }
+  .horaires tr.aujourdhui th::after { content: " (aujourd'hui)"; font-weight: 400; font-size: .85em; text-transform: none; }
+  address { font-style: normal; margin-top: 18px; font-size: 1.15rem; line-height: 1.55; }
+  address a { color: var(--t2); font-weight: 600; text-decoration: none; }
   .carte {
-    aspect-ratio: 4 / 3; border-radius: var(--rayon); overflow: hidden; margin-bottom: 14px;
-    display: grid; place-items: center;
-    background: repeating-linear-gradient(45deg, #4a2f21 0 14px, #45291c 14px 28px);
+    position: relative; aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; margin: 22px 0 12px;
+    display: grid; place-items: center; background: var(--baie);
+    background-image:
+      radial-gradient(circle at 50% 48%, var(--t2) 0 9px, transparent 10px),
+      repeating-linear-gradient(0deg, transparent 0 39px, #e9ebe61f 39px 40px),
+      repeating-linear-gradient(90deg, transparent 0 39px, #e9ebe61f 39px 40px);
   }
-  .carte :global(iframe) { width: 100%; height: 100%; border: 0; }
-  .lien-itin { width: 100%; }
+  .carte .btn { background: var(--brume); color: var(--torref); border-color: var(--brume); margin-top: 90px; }
+  .carte :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .lien-itin { width: 100%; color: var(--brume); border-color: var(--brume); }
   .reseaux { list-style: none; padding: 0; margin: 24px 0 0; display: flex; gap: 12px; }
-  .reseaux a { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: 50%; background: rgb(250 245 239 / .1); }
+  .reseaux a { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: 50%; background: #e9ebe61a; }
   .reseaux :global(svg) { width: 22px; height: 22px; }
-  @media (min-width: 768px) { .grille { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 768px) { .grille { grid-template-columns: 1fr 1fr; gap: 72px; } }
 </style>

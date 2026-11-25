@@ -1,47 +1,98 @@
 ---
-// Hero : photo d'ambiance + H1 SEO local + 2 actions immédiates
-// Pour changer la photo : remplacer src/assets/hero.jpg (Astro génère le WebP)
-import { Image } from 'astro:assets';
-import hero from '../assets/hero.jpg';
+// Hero : le nom en très grand, la promesse, les 2 actions,
+// puis la baie du Mont dessinée en SVG (aucune image à charger)
+// et la bande de torréfaction qui se "torréfie" au chargement.
 import Icone from './Icone.astro';
 import data from '../data/data.json';
 import { liens } from '../lib/liens.js';
 
 const c = data.commerce;
 const { itineraire, appel } = liens(c);
+// Silhouette stylisée du Mont-Saint-Michel (viewBox 400×160, horizon à y=150)
+const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 79 L187 63 L195 58 L197 34 L200 6 L203 34 L205 58 L213 63 L216 79 L226 84 L229 99 L241 103 L246 118 L261 124 L272 141 L304 150 Z';
 ---
 <header class="hero">
-  <Image src={hero} alt={`Boutique ${c.nom}, torréfacteur à ${c.ville}`} class="hero__img"
-         widths={[480, 800, 1200, 1600]} sizes="100vw" format="webp" quality={72}
-         loading="eager" fetchpriority="high" />
-  <div class="hero__voile"></div>
-  <div class="conteneur hero__contenu">
-    <p class="surtitre">{c.activite} · {c.ville}</p>
-    <h1>{c.nom}<span class="sr-only"> – {c.activite} à {c.ville}</span></h1>
-    <p class="hero__accroche">{c.accroche}</p>
-    <p class="hero__sous">{c.sousAccroche}</p>
-    <p class="statut hero__statut" data-statut>Horaires ci-dessous</p>
-    <div class="hero__actions">
-      <a class="btn btn--plein" href={itineraire} target="_blank" rel="noopener"><Icone nom="itineraire" />Voir l'itinéraire</a>
-      <a class="btn btn--contour" href={appel}><Icone nom="tel" />Appeler</a>
+  <div class="conteneur hero__grille">
+    <div class="hero__texte">
+      <p class="statut" data-statut></p>
+      <h1>
+        <span class="hero__nom">{c.nom}</span>
+        <span class="hero__metier">{c.activite} à {c.ville}</span>
+      </h1>
+      <p class="hero__accroche">{c.accroche}</p>
+      <p class="hero__sous">{c.sousAccroche}</p>
+      <div class="hero__actions">
+        <a class="btn btn--plein" href={itineraire} target="_blank" rel="noopener"><Icone nom="itineraire" />Voir l'itinéraire</a>
+        <a class="btn btn--contour" href={appel}><Icone nom="tel" />Appeler {c.telephoneAffiche}</a>
+      </div>
     </div>
+
+    <figure class="hero__baie" aria-hidden="true">
+      <svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMax slice">
+        <defs>
+          <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#e9ebe6" /><stop offset="1" stop-color="#d8d0c0" />
+          </linearGradient>
+          <linearGradient id="greve" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#c9c3b3" /><stop offset="1" stop-color="#b9b19e" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="150" fill="url(#ciel)" />
+        <circle cx="300" cy="62" r="20" fill="#f3efe6" />
+        <path d={mont} fill="#5e7179" />
+        <rect y="150" width="400" height="80" fill="url(#greve)" />
+        <!-- Reflet dans le sable mouillé -->
+        <path d={mont} fill="#5e7179" opacity=".22" transform="translate(0 300) scale(1 -1)" />
+        <g stroke="#e9ebe6" stroke-width="1.4" stroke-linecap="round" opacity=".8">
+          <path d="M20 166h90M160 172h140M40 186h60M250 190h120M90 204h170M10 218h80M300 214h80" />
+        </g>
+      </svg>
+    </figure>
+  </div>
+
+  <div class="torrefaction" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
   </div>
 </header>
 
 <style>
-  .hero { position: relative; min-height: 88svh; display: flex; align-items: flex-end; color: var(--creme); overflow: hidden; }
-  .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .hero__voile { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(43 26 18 / .15) 0%, rgb(43 26 18 / .85) 70%); }
-  .hero__contenu { position: relative; padding-top: 80px; padding-bottom: 40px; }
-  h1 { font-size: 3rem; margin-bottom: .15em; }
-  .hero__accroche { font-family: var(--police-titre); font-size: 1.3rem; margin: 0 0 .6em; color: var(--caramel-clair); }
-  .hero__sous { margin: 0 0 1em; max-width: 34ch; opacity: .92; }
-  .hero__statut { margin: 0 0 1.4em; }
-  .hero__actions { display: grid; gap: 12px; }
-  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  @media (min-width: 768px) {
-    .hero { min-height: 80vh; }
-    h1 { font-size: 4.5rem; }
-    .hero__actions { display: flex; }
+  .hero { padding-top: 28px; overflow: hidden; }
+  .hero__grille { display: grid; gap: 28px; }
+  h1 { margin-top: 18px; }
+  .hero__nom {
+    display: block;
+    font-size: clamp(4.2rem, 23vw, 9.5rem);
+    font-variation-settings: "wdth" 75;
+    font-weight: 800; letter-spacing: -0.045em; line-height: .86;
+  }
+  .hero__metier {
+    display: block; margin-top: 12px;
+    font-size: 1.15rem; font-weight: 500; color: var(--baie);
+  }
+  .hero__accroche {
+    margin-top: 22px; font-size: 1.45rem; line-height: 1.25; font-weight: 600;
+    font-variation-settings: "wdth" 85; max-width: 24ch;
+  }
+  .hero__sous { margin-top: 12px; color: var(--texte-doux); max-width: 40ch; }
+  .hero__actions { display: grid; gap: 10px; margin-top: 26px; }
+
+  .hero__baie { margin: 0 -20px; height: 230px; }
+  .hero__baie svg { width: 100%; height: 100%; }
+
+  /* Signature : la bande passe du grain vert au grain torréfié, une seule fois au chargement */
+  .torrefaction { display: flex; height: 18px; }
+  .torrefaction span { flex: 1; transform-origin: left; animation: torrefie .9s cubic-bezier(.2, .7, .2, 1) both; }
+  .torrefaction span:nth-child(1) { background: var(--t1); animation-delay: .15s; }
+  .torrefaction span:nth-child(2) { background: var(--t2); animation-delay: .3s; }
+  .torrefaction span:nth-child(3) { background: var(--t3); animation-delay: .45s; }
+  .torrefaction span:nth-child(4) { background: var(--t4); animation-delay: .6s; }
+  .torrefaction span:nth-child(5) { background: var(--t5); animation-delay: .75s; }
+  @keyframes torrefie { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  @media (min-width: 900px) {
+    .hero { padding-top: 56px; }
+    .hero__grille { grid-template-columns: 1.1fr 1fr; align-items: end; gap: 48px; }
+    .hero__actions { display: flex; flex-wrap: wrap; }
+    .hero__baie { margin: 0 -20px 0 0; height: 420px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%); mask-image: linear-gradient(90deg, transparent, #000 18%); }
   }
 </style>

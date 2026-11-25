@@ -1,83 +1,104 @@
 ---
-// Carte / produits : onglets en CSS pur (boutons radio), zéro JavaScript.
-// Chaque catégorie de data.json devient un onglet.
+// Nos cafés : onglets en CSS pur (boutons radio), zéro JavaScript.
+// Chaque café affiche son niveau de torréfaction sur l'échelle de la marque.
 import data from '../data/data.json';
 const { titre, intro, categories } = data.carte;
-const prixVisible = (p) => p && p !== 'A_CONFIRMER'; // masque les prix non validés
+const services = data.services;
+const prixVisible = (p) => p && p !== 'A_CONFIRMER'; // un prix non validé n'est pas affiché
+const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Foncée'];
 ---
-<section class="section" id="cafes" aria-labelledby="titre-cafes">
+<section class="section cafes" id="cafes" aria-labelledby="titre-cafes">
   <div class="conteneur">
-    <p class="surtitre">Torréfiés à {data.commerce.ville}</p>
     <h2 id="titre-cafes">{titre}</h2>
-    <p class="intro">{intro}</p>
+    <p class="chapeau">{intro}</p>
 
     <div class="onglets">
-      {categories.map((cat, i) => (
+      {categories.map((_, i) => (
         <input type="radio" name="cat" id={`cat-${i}`} checked={i === 0} class="onglets__radio" />
       ))}
-      <div class="onglets__barre" role="tablist">
-        {categories.map((cat, i) => <label for={`cat-${i}`} role="tab">{cat.nom}</label>)}
+      <div class="onglets__barre">
+        {categories.map((cat, i) => <label for={`cat-${i}`}>{cat.nom}</label>)}
       </div>
 
       {categories.map((cat, i) => (
-        <ul class="produits" data-i={i}>
+        <ul class="liste" data-i={i}>
           {cat.produits.map((p) => (
-            <li class="produit">
-              <div>
+            <li class="cafe">
+              <div class="cafe__tete">
                 <h3>{p.nom}</h3>
-                <p>{p.description}</p>
+                {(prixVisible(p.prix) || p.format) && (
+                  <p class="cafe__prix">{prixVisible(p.prix) && <strong>{p.prix}</strong>} {p.format}</p>
+                )}
               </div>
-              {(prixVisible(p.prix) || p.format) && (
-                <p class="produit__prix">
-                  {prixVisible(p.prix) && <strong>{p.prix}</strong>}
-                  {p.format && <span>{p.format}</span>}
-                </p>
+              {p.origine && <p class="cafe__origine">{p.origine}</p>}
+              {p.notes?.length > 0 && (
+                <ul class="cafe__notes" aria-label="Notes de dégustation">
+                  {p.notes.map((n) => <li>{n}</li>)}
+                </ul>
+              )}
+              {p.torrefaction && (
+                <div class="cafe__torref">
+                  <div class="echelle" role="img" aria-label={`Torréfaction ${NIVEAUX[p.torrefaction].toLowerCase()}, ${p.torrefaction} sur 5`}>
+                    {[1, 2, 3, 4, 5].map((n) => <i class={n <= p.torrefaction ? 'on' : ''}></i>)}
+                  </div>
+                  <span>Torréfaction {NIVEAUX[p.torrefaction].toLowerCase()}</span>
+                </div>
               )}
             </li>
           ))}
         </ul>
       ))}
     </div>
+
+    <ul class="services">
+      {services.map((s) => <li><h3>{s.titre}</h3><p>{s.texte}</p></li>)}
+    </ul>
   </div>
 </section>
 
 <style>
-  .intro { color: var(--texte-doux); max-width: 60ch; margin-bottom: 28px; }
+  .cafes { background: var(--greve); }
+  .onglets { margin-top: 32px; }
   .onglets__radio { position: absolute; opacity: 0; pointer-events: none; }
-
-  /* Barre d'onglets défilante horizontalement sur petit écran */
-  .onglets__barre { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px 20px; padding: 0 20px 4px; }
+  .onglets__barre { display: flex; gap: 6px; border-bottom: 2px solid var(--torref); }
   .onglets__barre label {
-    flex: none; min-height: 44px; padding: 0 18px; display: flex; align-items: center;
-    border-radius: 999px; background: var(--blanc); border: 1.5px solid var(--caramel-clair);
-    font-weight: 600; cursor: pointer; user-select: none;
+    min-height: var(--tap); padding: 0 18px; display: flex; align-items: center;
+    font-weight: 600; cursor: pointer; border-radius: 6px 6px 0 0; user-select: none;
   }
 
-  .produits { list-style: none; padding: 0; margin: 0; display: none; gap: 12px; }
-  .produit {
-    display: flex; justify-content: space-between; gap: 16px;
-    background: var(--blanc); border-radius: var(--rayon); padding: 18px; box-shadow: var(--ombre);
-  }
-  .produit h3 { font-size: 1.15rem; margin-bottom: .2em; }
-  .produit p { margin: 0; color: var(--texte-doux); font-size: .95rem; }
-  .produit__prix { text-align: right; flex: none; display: flex; flex-direction: column; }
-  .produit__prix strong { color: var(--brun); font-size: 1.1rem; }
-  .produit__prix span { font-size: .85rem; }
+  .liste { list-style: none; padding: 0; margin: 0; display: none; }
+  .cafe { padding: 22px 0; border-bottom: 1px solid #33231c26; }
+  .cafe__tete { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .cafe h3 { font-size: 1.75rem; font-variation-settings: "wdth" 80; letter-spacing: -0.01em; }
+  .cafe__prix { white-space: nowrap; color: var(--texte-doux); }
+  .cafe__prix strong { color: var(--torref); font-size: 1.15rem; }
+  .cafe__origine { color: var(--baie); font-weight: 500; margin-top: 2px; }
+  .cafe__notes { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .cafe__notes li { padding: 3px 11px; border-radius: 999px; background: var(--brume); font-size: .92rem; }
+  .cafe__torref { display: grid; grid-template-columns: 120px auto; align-items: center; gap: 12px; margin-top: 14px; font-size: .9rem; color: var(--texte-doux); }
 
-  /* Affiche la liste et active l'onglet correspondant au radio coché (jusqu'à 6 catégories) */
-  #cat-0:checked ~ .produits[data-i="0"], #cat-1:checked ~ .produits[data-i="1"],
-  #cat-2:checked ~ .produits[data-i="2"], #cat-3:checked ~ .produits[data-i="3"],
-  #cat-4:checked ~ .produits[data-i="4"], #cat-5:checked ~ .produits[data-i="5"] { display: grid; }
+  /* Onglet actif + liste visible (jusqu'à 6 catégories) */
+  #cat-0:checked ~ .liste[data-i="0"], #cat-1:checked ~ .liste[data-i="1"],
+  #cat-2:checked ~ .liste[data-i="2"], #cat-3:checked ~ .liste[data-i="3"],
+  #cat-4:checked ~ .liste[data-i="4"], #cat-5:checked ~ .liste[data-i="5"] { display: block; }
   #cat-0:checked ~ .onglets__barre label[for="cat-0"], #cat-1:checked ~ .onglets__barre label[for="cat-1"],
   #cat-2:checked ~ .onglets__barre label[for="cat-2"], #cat-3:checked ~ .onglets__barre label[for="cat-3"],
   #cat-4:checked ~ .onglets__barre label[for="cat-4"], #cat-5:checked ~ .onglets__barre label[for="cat-5"] {
-    background: var(--brun); color: var(--creme); border-color: var(--brun);
+    background: var(--torref); color: var(--brume);
   }
-  .onglets__radio:focus-visible ~ .onglets__barre { outline: 3px solid var(--caramel); outline-offset: 4px; border-radius: 12px; }
+  .onglets__radio:focus-visible ~ .onglets__barre { outline: 3px solid var(--baie); outline-offset: 4px; }
+
+  .services { list-style: none; padding: 0; margin: 40px 0 0; display: grid; gap: 12px; }
+  .services li { background: var(--torref); color: var(--brume); padding: 20px 22px; border-radius: 6px; }
+  .services h3 { font-size: 1.2rem; color: var(--t2); }
+  .services p { margin-top: 4px; opacity: .85; }
 
   @media (min-width: 768px) {
-    #cat-0:checked ~ .produits[data-i="0"], #cat-1:checked ~ .produits[data-i="1"],
-    #cat-2:checked ~ .produits[data-i="2"], #cat-3:checked ~ .produits[data-i="3"],
-    #cat-4:checked ~ .produits[data-i="4"], #cat-5:checked ~ .produits[data-i="5"] { grid-template-columns: 1fr 1fr; }
+    #cat-0:checked ~ .liste[data-i="0"], #cat-1:checked ~ .liste[data-i="1"],
+    #cat-2:checked ~ .liste[data-i="2"], #cat-3:checked ~ .liste[data-i="3"],
+    #cat-4:checked ~ .liste[data-i="4"], #cat-5:checked ~ .liste[data-i="5"] {
+      display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 32px;
+    }
+    .services { grid-template-columns: 1fr 1fr; }
   }
 </style>

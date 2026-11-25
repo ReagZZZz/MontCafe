@@ -1,19 +1,16 @@
 {
   "_lisezMoi": "FICHIER UNIQUE À MODIFIER. Horaires au format HH:MM. Les champs marqués 'A_CONFIRMER' sont à valider avec le client avant mise en ligne.",
-
   "site": {
     "url": "https://montcafe-avranches.netlify.app",
     "titre": "MontCafé – Torréfacteur artisanal à Avranches",
-    "description": "MontCafé, torréfaction artisanale à Avranches (Manche). Cafés de spécialité en grains ou moulus, torréfiés sur place place Saint-Aubert. Dégustation en boutique.",
+    "description": "MontCafé, torréfacteur artisanal place Saint-Aubert à Avranches. Cafés de spécialité torréfiés sur place, en grains ou moulus. Dégustation offerte en boutique.",
     "langue": "fr"
   },
-
   "commerce": {
     "nom": "MontCafé",
-    "activite": "Torréfacteur artisanal",
     "ville": "Avranches",
-    "accroche": "Torréfaction artisanale au cœur d'Avranches",
-    "sousAccroche": "Des grains sélectionnés, torréfiés lentement sur place. Passez goûter, Laurent vous conseille.",
+    "accroche": "Le café torréfié place Saint-Aubert, face à la baie.",
+    "sousAccroche": "Laurent torréfie ses grains en petites fournées, lentement, à basse température. Passez goûter avant de choisir : la dégustation est offerte.",
     "telephone": "+33672175143",
     "telephoneAffiche": "06 72 17 51 43",
     "email": "A_CONFIRMER",
@@ -24,55 +21,170 @@
       "region": "Normandie",
       "pays": "FR"
     },
-    "gps": { "lat": 48.6865225, "lng": -1.3602206 },
+    "gps": {
+      "lat": 48.6865225,
+      "lng": -1.3602206
+    },
     "googlePlaceId": "ChIJl2GeUQBVCUgRcZ8ZmKo9tyU",
     "prix": "€",
     "reseaux": {
       "instagram": "",
       "facebook": ""
-    }
+    },
+    "activite": "Torréfacteur"
   },
-
   "horaires": [
-    { "jour": "lundi",    "creneaux": [] },
-    { "jour": "mardi",    "creneaux": [["10:00", "12:30"], ["13:30", "19:00"]] },
-    { "jour": "mercredi", "creneaux": [["13:30", "19:00"]] },
-    { "jour": "jeudi",    "creneaux": [["13:30", "19:00"]] },
-    { "jour": "vendredi", "creneaux": [["10:00", "12:30"], ["13:30", "19:00"]] },
-    { "jour": "samedi",   "creneaux": [["08:30", "13:30"], ["15:00", "19:00"]] },
-    { "jour": "dimanche", "creneaux": [] }
+    {
+      "jour": "lundi",
+      "creneaux": []
+    },
+    {
+      "jour": "mardi",
+      "creneaux": [
+        [
+          "10:00",
+          "12:30"
+        ],
+        [
+          "13:30",
+          "19:00"
+        ]
+      ]
+    },
+    {
+      "jour": "mercredi",
+      "creneaux": [
+        [
+          "13:30",
+          "19:00"
+        ]
+      ]
+    },
+    {
+      "jour": "jeudi",
+      "creneaux": [
+        [
+          "13:30",
+          "19:00"
+        ]
+      ]
+    },
+    {
+      "jour": "vendredi",
+      "creneaux": [
+        [
+          "10:00",
+          "12:30"
+        ],
+        [
+          "13:30",
+          "19:00"
+        ]
+      ]
+    },
+    {
+      "jour": "samedi",
+      "creneaux": [
+        [
+          "08:30",
+          "13:30"
+        ],
+        [
+          "15:00",
+          "19:00"
+        ]
+      ]
+    },
+    {
+      "jour": "dimanche",
+      "creneaux": []
+    }
   ],
-
   "carte": {
     "titre": "Nos cafés",
-    "intro": "Torréfiés en petites fournées, à basse température, pour une tasse ronde et sans amertume. En grains ou moulus à la demande selon votre méthode (espresso, filtre, piston…).",
-    "_note": "EXEMPLES À REMPLACER par la vraie gamme et les vrais prix du client.",
+    "intro": "En grains ou moulus à la demande, pour l'espresso, le filtre, le piston ou l'italienne. La gamme tourne au fil des arrivages.",
+    "_note": "EXEMPLES À REMPLACER par la vraie gamme. torrefaction : 1 (très claire) à 5 (foncée). notes : 2 ou 3 arômes.",
     "categories": [
       {
         "nom": "Origines",
         "produits": [
-          { "nom": "Éthiopie", "description": "Notes florales et agrumes. Idéal en filtre.", "prix": "A_CONFIRMER", "format": "250 g" },
-          { "nom": "Brésil", "description": "Chocolat, noisette, très doux.", "prix": "A_CONFIRMER", "format": "250 g" },
-          { "nom": "Colombie", "description": "Équilibré, fruits rouges, belle rondeur.", "prix": "A_CONFIRMER", "format": "250 g" }
+          {
+            "nom": "Éthiopie",
+            "origine": "Yirgacheffe",
+            "notes": [
+              "jasmin",
+              "agrumes",
+              "bergamote"
+            ],
+            "torrefaction": 2,
+            "prix": "A_CONFIRMER",
+            "format": "250 g"
+          },
+          {
+            "nom": "Colombie",
+            "origine": "Huila",
+            "notes": [
+              "fruits rouges",
+              "caramel"
+            ],
+            "torrefaction": 3,
+            "prix": "A_CONFIRMER",
+            "format": "250 g"
+          },
+          {
+            "nom": "Brésil",
+            "origine": "Minas Gerais",
+            "notes": [
+              "chocolat au lait",
+              "noisette"
+            ],
+            "torrefaction": 4,
+            "prix": "A_CONFIRMER",
+            "format": "250 g"
+          }
         ]
       },
       {
         "nom": "Assemblages",
         "produits": [
-          { "nom": "Assemblage Maison", "description": "Le café du quotidien, parfait en espresso.", "prix": "A_CONFIRMER", "format": "250 g" },
-          { "nom": "Décaféiné", "description": "Tout le goût, sans la caféine.", "prix": "A_CONFIRMER", "format": "250 g" }
-        ]
-      },
-      {
-        "nom": "En boutique",
-        "produits": [
-          { "nom": "Dégustation", "description": "Goûtez les cafés du moment avant de choisir.", "prix": "Offerte", "format": "" },
-          { "nom": "Mouture à la demande", "description": "Espresso, filtre, piston, italienne.", "prix": "Gratuit", "format": "" }
+          {
+            "nom": "Le Saint-Aubert",
+            "origine": "Assemblage maison",
+            "notes": [
+              "cacao",
+              "biscuit",
+              "rond"
+            ],
+            "torrefaction": 4,
+            "prix": "A_CONFIRMER",
+            "format": "250 g"
+          },
+          {
+            "nom": "Grève",
+            "origine": "Assemblage doux",
+            "notes": [
+              "céréales",
+              "miel"
+            ],
+            "torrefaction": 3,
+            "prix": "A_CONFIRMER",
+            "format": "250 g"
+          },
+          {
+            "nom": "Décaféiné",
+            "origine": "Procédé à l'eau",
+            "notes": [
+              "cacao",
+              "amande"
+            ],
+            "torrefaction": 4,
+            "prix": "A_CONFIRMER",
+            "format": "250 g"
+          }
         ]
       }
     ]
   },
-
   "mentionsLegales": {
     "raisonSociale": "MONTCAFÉ",
     "formeJuridique": "SAS (société par actions simplifiée)",
@@ -88,5 +200,42 @@
       "site": "https://www.netlify.com"
     },
     "realisation": "A_CONFIRMER (ton nom / ta structure)"
-  }
+  },
+  "avis": {
+    "_note": "Note et nombre d'avis Google relevés le 25/11/2026, à mettre à jour de temps en temps.",
+    "note": 5.0,
+    "nombre": 37,
+    "lien": "https://search.google.com/local/reviews?placeid=ChIJl2GeUQBVCUgRcZ8ZmKo9tyU"
+  },
+  "atelier": {
+    "titre": "Du grain vert à votre tasse",
+    "etapes": [
+      {
+        "titre": "Le choix du grain vert",
+        "texte": "Des cafés de spécialité sélectionnés par origine, achetés crus."
+      },
+      {
+        "titre": "Une torréfaction lente",
+        "texte": "Petites fournées, température douce : les arômes se développent sans amertume."
+      },
+      {
+        "titre": "Le repos",
+        "texte": "Le grain dégaze quelques jours avant d'arriver en rayon, au meilleur de sa fraîcheur."
+      },
+      {
+        "titre": "La mouture à la demande",
+        "texte": "En grains ou moulu devant vous, réglé pour votre cafetière."
+      }
+    ]
+  },
+  "services": [
+    {
+      "titre": "Dégustation offerte",
+      "texte": "Goûtez les cafés du moment avant d'acheter."
+    },
+    {
+      "titre": "Mouture sur place",
+      "texte": "Espresso, filtre, piston, italienne : dites-nous votre machine."
+    }
+  ]
 }
