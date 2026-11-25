@@ -1,0 +1,68 @@
+/* ==========================================================
+   MontCafé – styles globaux (mobile-first : base = 375px)
+   Les media queries n'ajoutent que des ajustements pour écrans larges.
+   ========================================================== */
+
+:root {
+  /* Palette chaleureuse "grain torréfié" */
+  --brun-fonce: #2b1a12;
+  --brun: #3b2418;
+  --caramel: #c8894f;
+  --caramel-clair: #e9c9a3;
+  --creme: #faf5ef;
+  --texte: #2b1a12;
+  --texte-doux: #6b5547;
+  --blanc: #fff;
+
+  --rayon: 14px;
+  --ombre: 0 4px 18px rgb(43 26 18 / .10);
+  --tap: 48px;                 /* taille minimale des zones tactiles */
+  --barre-h: 72px;             /* hauteur de la barre d'actions mobile */
+
+  --police-titre: "Georgia", "Times New Roman", serif;
+  --police-texte: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font: 17px/1.55 var(--police-texte);
+  color: var(--texte);
+  background: var(--creme);
+  padding-bottom: calc(var(--barre-h) + env(safe-area-inset-bottom)); /* place pour la barre fixe */
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--police-titre); line-height: 1.15; margin: 0 0 .5em; }
+h2 { font-size: 1.75rem; }
+
+.conteneur { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 20px; }
+.section { padding: 56px 0; }
+.section--sombre { background: var(--brun); color: var(--creme); }
+.surtitre { text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; color: var(--caramel); font-weight: 700; margin: 0 0 .4em; }
+
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5em;
+  min-height: var(--tap); padding: 0 22px; border-radius: 999px;
+  font-weight: 700; font-size: 1rem; text-decoration: none; border: 2px solid transparent;
+  cursor: pointer; transition: transform .15s, background .15s;
+}
+.btn:active { transform: scale(.97); }
+.btn--plein { background: var(--caramel); color: var(--brun-fonce); }
+.btn--contour { border-color: var(--creme); color: var(--creme); background: rgb(0 0 0 / .15); }
+.btn svg { width: 20px; height: 20px; flex: none; }
+:focus-visible { outline: 3px solid var(--caramel); outline-offset: 3px; }
+
+/* ---------- Badge ouvert / fermé ---------- */
+.statut { display: inline-flex; align-items: center; gap: .45em; font-weight: 600; font-size: .95rem; }
+.statut::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--texte-doux); }
+.statut[data-etat="ouvert"]::before { background: #3fb36b; }
+.statut[data-etat="ferme"]::before { background: #d9534f; }
+
+@media (min-width: 768px) {
+  body { padding-bottom: 0; }
+  h2 { font-size: 2.2rem; }
+  .section { padding: 88px 0; }
+}

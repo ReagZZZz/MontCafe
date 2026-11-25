@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.montcafe-avranches.fr/sitemap-index.xml

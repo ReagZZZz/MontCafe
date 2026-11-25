@@ -1,0 +1,36 @@
+---
+// Balisage Schema.org généré depuis data.json (aucune saisie manuelle)
+// Type double : CafeOrCoffeeShop + Store, car MontCafé torréfie ET vend des grains.
+import data from '../data/data.json';
+import { horairesSchema } from '../lib/horaires.js';
+
+const c = data.commerce;
+const sameAs = Object.values(c.reseaux).filter(Boolean);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': ['CafeOrCoffeeShop', 'Store'],
+  '@id': `${data.site.url}/#commerce`,
+  name: c.nom,
+  description: data.site.description,
+  url: data.site.url,
+  telephone: c.telephone,
+  ...(c.email && c.email !== 'A_CONFIRMER' ? { email: c.email } : {}),
+  priceRange: c.prix,
+  servesCuisine: 'Café de spécialité',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: c.adresse.rue,
+    postalCode: c.adresse.codePostal,
+    addressLocality: c.adresse.ville,
+    addressRegion: c.adresse.region,
+    addressCountry: c.adresse.pays,
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: c.gps.lat, longitude: c.gps.lng },
+  hasMap: `https://www.google.com/maps/place/?q=place_id:${c.googlePlaceId}`,
+  areaServed: [c.ville, 'Baie du Mont-Saint-Michel', 'Manche'],
+  openingHoursSpecification: horairesSchema(data.horaires),
+  ...(sameAs.length ? { sameAs } : {}),
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

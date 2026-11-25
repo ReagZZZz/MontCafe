@@ -1,0 +1,83 @@
+---
+// Carte / produits : onglets en CSS pur (boutons radio), zéro JavaScript.
+// Chaque catégorie de data.json devient un onglet.
+import data from '../data/data.json';
+const { titre, intro, categories } = data.carte;
+const prixVisible = (p) => p && p !== 'A_CONFIRMER'; // masque les prix non validés
+---
+<section class="section" id="cafes" aria-labelledby="titre-cafes">
+  <div class="conteneur">
+    <p class="surtitre">Torréfiés à {data.commerce.ville}</p>
+    <h2 id="titre-cafes">{titre}</h2>
+    <p class="intro">{intro}</p>
+
+    <div class="onglets">
+      {categories.map((cat, i) => (
+        <input type="radio" name="cat" id={`cat-${i}`} checked={i === 0} class="onglets__radio" />
+      ))}
+      <div class="onglets__barre" role="tablist">
+        {categories.map((cat, i) => <label for={`cat-${i}`} role="tab">{cat.nom}</label>)}
+      </div>
+
+      {categories.map((cat, i) => (
+        <ul class="produits" data-i={i}>
+          {cat.produits.map((p) => (
+            <li class="produit">
+              <div>
+                <h3>{p.nom}</h3>
+                <p>{p.description}</p>
+              </div>
+              {(prixVisible(p.prix) || p.format) && (
+                <p class="produit__prix">
+                  {prixVisible(p.prix) && <strong>{p.prix}</strong>}
+                  {p.format && <span>{p.format}</span>}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro { color: var(--texte-doux); max-width: 60ch; margin-bottom: 28px; }
+  .onglets__radio { position: absolute; opacity: 0; pointer-events: none; }
+
+  /* Barre d'onglets défilante horizontalement sur petit écran */
+  .onglets__barre { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px 20px; padding: 0 20px 4px; }
+  .onglets__barre label {
+    flex: none; min-height: 44px; padding: 0 18px; display: flex; align-items: center;
+    border-radius: 999px; background: var(--blanc); border: 1.5px solid var(--caramel-clair);
+    font-weight: 600; cursor: pointer; user-select: none;
+  }
+
+  .produits { list-style: none; padding: 0; margin: 0; display: none; gap: 12px; }
+  .produit {
+    display: flex; justify-content: space-between; gap: 16px;
+    background: var(--blanc); border-radius: var(--rayon); padding: 18px; box-shadow: var(--ombre);
+  }
+  .produit h3 { font-size: 1.15rem; margin-bottom: .2em; }
+  .produit p { margin: 0; color: var(--texte-doux); font-size: .95rem; }
+  .produit__prix { text-align: right; flex: none; display: flex; flex-direction: column; }
+  .produit__prix strong { color: var(--brun); font-size: 1.1rem; }
+  .produit__prix span { font-size: .85rem; }
+
+  /* Affiche la liste et active l'onglet correspondant au radio coché (jusqu'à 6 catégories) */
+  #cat-0:checked ~ .produits[data-i="0"], #cat-1:checked ~ .produits[data-i="1"],
+  #cat-2:checked ~ .produits[data-i="2"], #cat-3:checked ~ .produits[data-i="3"],
+  #cat-4:checked ~ .produits[data-i="4"], #cat-5:checked ~ .produits[data-i="5"] { display: grid; }
+  #cat-0:checked ~ .onglets__barre label[for="cat-0"], #cat-1:checked ~ .onglets__barre label[for="cat-1"],
+  #cat-2:checked ~ .onglets__barre label[for="cat-2"], #cat-3:checked ~ .onglets__barre label[for="cat-3"],
+  #cat-4:checked ~ .onglets__barre label[for="cat-4"], #cat-5:checked ~ .onglets__barre label[for="cat-5"] {
+    background: var(--brun); color: var(--creme); border-color: var(--brun);
+  }
+  .onglets__radio:focus-visible ~ .onglets__barre { outline: 3px solid var(--caramel); outline-offset: 4px; border-radius: 12px; }
+
+  @media (min-width: 768px) {
+    #cat-0:checked ~ .produits[data-i="0"], #cat-1:checked ~ .produits[data-i="1"],
+    #cat-2:checked ~ .produits[data-i="2"], #cat-3:checked ~ .produits[data-i="3"],
+    #cat-4:checked ~ .produits[data-i="4"], #cat-5:checked ~ .produits[data-i="5"] { grid-template-columns: 1fr 1fr; }
+  }
+</style>

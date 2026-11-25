@@ -1,0 +1,92 @@
+---
+// Infos pratiques : horaires (jour courant surligné), adresse, carte au clic, réseaux
+import data from '../data/data.json';
+import { hFr } from '../lib/horaires.js';
+import { liens } from '../lib/liens.js';
+import Icone from './Icone.astro';
+
+const c = data.commerce;
+const { itineraire, appel, embed } = liens(c);
+const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
+---
+<section class="section section--sombre" id="infos" aria-labelledby="titre-infos">
+  <div class="conteneur grille">
+    <div>
+      <p class="surtitre">Infos pratiques</p>
+      <h2 id="titre-infos">Horaires d'ouverture</h2>
+      <p class="statut" data-statut></p>
+      <table class="horaires">
+        <tbody>
+          {data.horaires.map(({ jour, creneaux }) => (
+            <tr data-jour={jour} class={creneaux.length ? '' : 'ferme'}>
+              <th scope="row">{jour}</th>
+              <td>{creneaux.length ? creneaux.map(([a, b]) => <span class="creneau">{hFr(a)} – {hFr(b)}</span>) : 'Fermé'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h2>Nous trouver</h2>
+      <address>
+        <strong>{c.nom}</strong><br />
+        {c.adresse.rue}<br />
+        {c.adresse.codePostal} {c.adresse.ville}<br />
+        <a href={appel}>{c.telephoneAffiche}</a>
+      </address>
+
+      <!-- Carte "façade" : l'iframe Google Maps (~500 Ko) n'est chargée qu'au clic -->
+      <div class="carte" data-embed={embed}>
+        <button type="button" class="btn btn--plein" data-charger-carte>
+          <Icone nom="carte" />Afficher la carte
+        </button>
+      </div>
+
+      <a class="btn btn--contour lien-itin" href={itineraire} target="_blank" rel="noopener">
+        <Icone nom="itineraire" />Itinéraire Google Maps
+      </a>
+
+      {reseaux.length > 0 && (
+        <ul class="reseaux">
+          {reseaux.map(([nom, url]) => (
+            <li><a href={url} target="_blank" rel="noopener" aria-label={`${c.nom} sur ${nom}`}><Icone nom={nom} /></a></li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  // Chargement de la carte uniquement à la demande (performance)
+  document.querySelector('[data-charger-carte]')?.addEventListener('click', (e) => {
+    const box = e.currentTarget.parentElement;
+    box.innerHTML = `<iframe src="${box.dataset.embed}" title="Plan d'accès" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
+  });
+</script>
+
+<style>
+  .grille { display: grid; gap: 48px; }
+  .horaires { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .horaires th, .horaires td { padding: 12px 0; border-bottom: 1px solid rgb(250 245 239 / .12); text-align: left; }
+  .horaires th { text-transform: capitalize; font-weight: 600; width: 38%; }
+  .horaires td { text-align: right; font-variant-numeric: tabular-nums; }
+  .horaires tr.ferme td { opacity: .55; }
+  .horaires tr.aujourdhui { color: var(--caramel-clair); }
+  .horaires tr.aujourdhui th::after { content: " · aujourd'hui"; font-weight: 400; font-size: .85em; text-transform: none; }
+  .creneau { display: block; }
+  address { font-style: normal; margin-bottom: 20px; line-height: 1.7; }
+  address a { color: var(--caramel-clair); font-weight: 700; }
+  .carte {
+    aspect-ratio: 4 / 3; border-radius: var(--rayon); overflow: hidden; margin-bottom: 14px;
+    display: grid; place-items: center;
+    background: repeating-linear-gradient(45deg, #4a2f21 0 14px, #45291c 14px 28px);
+  }
+  .carte :global(iframe) { width: 100%; height: 100%; border: 0; }
+  .lien-itin { width: 100%; }
+  .reseaux { list-style: none; padding: 0; margin: 24px 0 0; display: flex; gap: 12px; }
+  .reseaux a { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: 50%; background: rgb(250 245 239 / .1); }
+  .reseaux :global(svg) { width: 22px; height: 22px; }
+  @media (min-width: 768px) { .grille { grid-template-columns: 1fr 1fr; } }
+</style>

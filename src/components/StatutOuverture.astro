@@ -1,0 +1,31 @@
+---
+// Mini-script (≈1 Ko) : "Ouvert jusqu'à 19h" / "Fermé · ouvre mardi à 10h"
+// + surligne le jour courant dans le tableau. Heure calculée en Europe/Paris.
+import data from '../data/data.json';
+---
+<script is:inline define:vars={{ horaires: data.horaires }}>
+  (() => {
+    const hFr = (h) => h.replace(/^0/, '').replace(':00', 'h').replace(':', 'h');
+    const min = (h) => { const [a, b] = h.split(':'); return a * 60 + +b; };
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    const idx = (now.getDay() + 6) % 7; // 0 = lundi
+    const m = now.getHours() * 60 + now.getMinutes();
+    const jour = horaires[idx];
+
+    let etat = 'ferme', texte = '';
+    const enCours = jour.creneaux.find(([o, f]) => m >= min(o) && m < min(f));
+    if (enCours) {
+      etat = 'ouvert';
+      texte = `Ouvert maintenant · jusqu'à ${hFr(enCours[1])}`;
+    } else {
+      const plusTard = jour.creneaux.find(([o]) => min(o) > m);
+      if (plusTard) texte = `Fermé · ouvre à ${hFr(plusTard[0])}`;
+      else for (let d = 1; d <= 7; d++) {
+        const j = horaires[(idx + d) % 7];
+        if (j.creneaux.length) { texte = `Fermé · ouvre ${d === 1 ? 'demain' : j.jour} à ${hFr(j.creneaux[0][0])}`; break; }
+      }
+    }
+    document.querySelectorAll('[data-statut]').forEach((el) => { el.dataset.etat = etat; el.textContent = texte; });
+    document.querySelector(`tr[data-jour="${jour.jour}"]`)?.classList.add('aujourdhui');
+  })();
+</script>

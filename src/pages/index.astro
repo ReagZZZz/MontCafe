@@ -1,0 +1,22 @@
+---
+// Page d'accueil (one-page) : Hero → Nos cafés → Infos pratiques → Pied de page
+import Base from '../layouts/Base.astro';
+import Schema from '../components/Schema.astro';
+import Hero from '../components/Hero.astro';
+import Carte from '../components/Carte.astro';
+import Infos from '../components/Infos.astro';
+import Footer from '../components/Footer.astro';
+import BarreActions from '../components/BarreActions.astro';
+import StatutOuverture from '../components/StatutOuverture.astro';
+---
+<Base>
+  <Schema slot="head" />
+  <Hero />
+  <main>
+    <Carte />
+    <Infos />
+  </main>
+  <Footer />
+  <BarreActions />
+  <StatutOuverture />
+</Base>

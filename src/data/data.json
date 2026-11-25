@@ -1,0 +1,92 @@
+{
+  "_lisezMoi": "FICHIER UNIQUE À MODIFIER. Horaires au format HH:MM. Les champs marqués 'A_CONFIRMER' sont à valider avec le client avant mise en ligne.",
+
+  "site": {
+    "url": "https://www.montcafe-avranches.fr",
+    "titre": "MontCafé – Torréfacteur artisanal à Avranches",
+    "description": "MontCafé, torréfaction artisanale à Avranches (Manche). Cafés de spécialité en grains ou moulus, torréfiés sur place place Saint-Aubert. Dégustation en boutique.",
+    "langue": "fr"
+  },
+
+  "commerce": {
+    "nom": "MontCafé",
+    "activite": "Torréfacteur artisanal",
+    "ville": "Avranches",
+    "accroche": "Torréfaction artisanale au cœur d'Avranches",
+    "sousAccroche": "Des grains sélectionnés, torréfiés lentement sur place. Passez goûter, Laurent vous conseille.",
+    "telephone": "+33672175143",
+    "telephoneAffiche": "06 72 17 51 43",
+    "email": "A_CONFIRMER",
+    "adresse": {
+      "rue": "5 place Saint-Aubert",
+      "codePostal": "50300",
+      "ville": "Avranches",
+      "region": "Normandie",
+      "pays": "FR"
+    },
+    "gps": { "lat": 48.6865225, "lng": -1.3602206 },
+    "googlePlaceId": "ChIJl2GeUQBVCUgRcZ8ZmKo9tyU",
+    "prix": "€",
+    "reseaux": {
+      "instagram": "",
+      "facebook": ""
+    }
+  },
+
+  "horaires": [
+    { "jour": "lundi",    "creneaux": [] },
+    { "jour": "mardi",    "creneaux": [["10:00", "12:30"], ["13:30", "19:00"]] },
+    { "jour": "mercredi", "creneaux": [["13:30", "19:00"]] },
+    { "jour": "jeudi",    "creneaux": [["13:30", "19:00"]] },
+    { "jour": "vendredi", "creneaux": [["10:00", "12:30"], ["13:30", "19:00"]] },
+    { "jour": "samedi",   "creneaux": [["08:30", "13:30"], ["15:00", "19:00"]] },
+    { "jour": "dimanche", "creneaux": [] }
+  ],
+
+  "carte": {
+    "titre": "Nos cafés",
+    "intro": "Torréfiés en petites fournées, à basse température, pour une tasse ronde et sans amertume. En grains ou moulus à la demande selon votre méthode (espresso, filtre, piston…).",
+    "_note": "EXEMPLES À REMPLACER par la vraie gamme et les vrais prix du client.",
+    "categories": [
+      {
+        "nom": "Origines",
+        "produits": [
+          { "nom": "Éthiopie", "description": "Notes florales et agrumes. Idéal en filtre.", "prix": "A_CONFIRMER", "format": "250 g" },
+          { "nom": "Brésil", "description": "Chocolat, noisette, très doux.", "prix": "A_CONFIRMER", "format": "250 g" },
+          { "nom": "Colombie", "description": "Équilibré, fruits rouges, belle rondeur.", "prix": "A_CONFIRMER", "format": "250 g" }
+        ]
+      },
+      {
+        "nom": "Assemblages",
+        "produits": [
+          { "nom": "Assemblage Maison", "description": "Le café du quotidien, parfait en espresso.", "prix": "A_CONFIRMER", "format": "250 g" },
+          { "nom": "Décaféiné", "description": "Tout le goût, sans la caféine.", "prix": "A_CONFIRMER", "format": "250 g" }
+        ]
+      },
+      {
+        "nom": "En boutique",
+        "produits": [
+          { "nom": "Dégustation", "description": "Goûtez les cafés du moment avant de choisir.", "prix": "Offerte", "format": "" },
+          { "nom": "Mouture à la demande", "description": "Espresso, filtre, piston, italienne.", "prix": "Gratuit", "format": "" }
+        ]
+      }
+    ]
+  },
+
+  "mentionsLegales": {
+    "raisonSociale": "MONTCAFÉ",
+    "formeJuridique": "SAS (société par actions simplifiée)",
+    "capital": "2 000 €",
+    "siege": "3 place Saint-Aubert, 50300 Avranches",
+    "rcs": "RCS Coutances 941 369 209",
+    "siret": "941 369 209 00015",
+    "tvaIntracom": "A_CONFIRMER",
+    "directeurPublication": "Laurent Masotta, Président",
+    "hebergeur": {
+      "nom": "Netlify, Inc.",
+      "adresse": "A_CONFIRMER (voir netlify.com/legal)",
+      "site": "https://www.netlify.com"
+    },
+    "realisation": "A_CONFIRMER (ton nom / ta structure)"
+  }
+}

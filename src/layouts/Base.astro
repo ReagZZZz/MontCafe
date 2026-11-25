@@ -1,0 +1,39 @@
+---
+// Layout commun : <head> SEO complet (meta, Open Graph, canonical) + styles globaux
+import '../styles/global.css';
+import data from '../data/data.json';
+
+interface Props { titre?: string; description?: string; noindex?: boolean }
+const { titre = data.site.titre, description = data.site.description, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang={data.site.langue}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titre}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#3b2418" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Géolocalisation (SEO local) -->
+    <meta name="geo.region" content="FR-50" />
+    <meta name="geo.placename" content={data.commerce.ville} />
+    <meta name="geo.position" content={`${data.commerce.gps.lat};${data.commerce.gps.lng}`} />
+
+    <!-- Open Graph (partage Facebook / WhatsApp / SMS) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content={data.commerce.nom} />
+    <meta property="og:title" content={titre} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

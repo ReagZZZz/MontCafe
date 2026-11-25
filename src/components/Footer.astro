@@ -1,0 +1,18 @@
+---
+// Pied de page : NAP (nom/adresse/téléphone) répété pour le SEO local + lien mentions légales
+import data from '../data/data.json';
+const c = data.commerce;
+const annee = new Date().getFullYear();
+---
+<footer class="pied">
+  <div class="conteneur">
+    <p><strong>{c.nom}</strong> · {c.activite} · {c.adresse.rue}, {c.adresse.codePostal} {c.adresse.ville} · <a href={`tel:${c.telephone}`}>{c.telephoneAffiche}</a></p>
+    <p>© {annee} {c.nom} · <a href="/mentions-legales/">Mentions légales</a></p>
+  </div>
+</footer>
+
+<style>
+  .pied { background: var(--brun-fonce); color: rgb(250 245 239 / .75); font-size: .88rem; padding: 28px 0; text-align: center; }
+  .pied p { margin: .4em 0; }
+  .pied a { color: var(--caramel-clair); }
+</style>

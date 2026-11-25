@@ -1,0 +1,47 @@
+---
+// Hero : photo d'ambiance + H1 SEO local + 2 actions immédiates
+// Pour changer la photo : remplacer src/assets/hero.jpg (Astro génère le WebP)
+import { Image } from 'astro:assets';
+import hero from '../assets/hero.jpg';
+import Icone from './Icone.astro';
+import data from '../data/data.json';
+import { liens } from '../lib/liens.js';
+
+const c = data.commerce;
+const { itineraire, appel } = liens(c);
+---
+<header class="hero">
+  <Image src={hero} alt={`Boutique ${c.nom}, torréfacteur à ${c.ville}`} class="hero__img"
+         widths={[480, 800, 1200, 1600]} sizes="100vw" format="webp" quality={72}
+         loading="eager" fetchpriority="high" />
+  <div class="hero__voile"></div>
+  <div class="conteneur hero__contenu">
+    <p class="surtitre">{c.activite} · {c.ville}</p>
+    <h1>{c.nom}<span class="sr-only"> – {c.activite} à {c.ville}</span></h1>
+    <p class="hero__accroche">{c.accroche}</p>
+    <p class="hero__sous">{c.sousAccroche}</p>
+    <p class="statut hero__statut" data-statut>Horaires ci-dessous</p>
+    <div class="hero__actions">
+      <a class="btn btn--plein" href={itineraire} target="_blank" rel="noopener"><Icone nom="itineraire" />Voir l'itinéraire</a>
+      <a class="btn btn--contour" href={appel}><Icone nom="tel" />Appeler</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .hero { position: relative; min-height: 88svh; display: flex; align-items: flex-end; color: var(--creme); overflow: hidden; }
+  .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero__voile { position: absolute; inset: 0; background: linear-gradient(180deg, rgb(43 26 18 / .15) 0%, rgb(43 26 18 / .85) 70%); }
+  .hero__contenu { position: relative; padding-top: 80px; padding-bottom: 40px; }
+  h1 { font-size: 3rem; margin-bottom: .15em; }
+  .hero__accroche { font-family: var(--police-titre); font-size: 1.3rem; margin: 0 0 .6em; color: var(--caramel-clair); }
+  .hero__sous { margin: 0 0 1em; max-width: 34ch; opacity: .92; }
+  .hero__statut { margin: 0 0 1.4em; }
+  .hero__actions { display: grid; gap: 12px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (min-width: 768px) {
+    .hero { min-height: 80vh; }
+    h1 { font-size: 4.5rem; }
+    .hero__actions { display: flex; }
+  }
+</style>
