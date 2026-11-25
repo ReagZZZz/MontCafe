@@ -1,0 +1,107 @@
+---
+// Commande simple à emporter : pas de paiement en ligne, un formulaire
+// qui envoie la commande par e-mail via Formspree (zéro backend, zéro
+// base de données — conforme au principe KISS du projet).
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import { commerce, cafes } from '../lib/boutique.js';
+import site from '../data/site.json';
+
+const produitsDispo = cafes.categories.flatMap((cat) =>
+  cat.produits.map((p) => ({ cle: `${cat.nom} — ${p.nom}`, format: p.format }))
+);
+const envoye = Astro.url.searchParams.get('envoye') === '1';
+---
+<Base
+  titre={`Commander à emporter – ${commerce.nom}`}
+  description={`Passez votre commande de café à emporter chez ${commerce.nom}, ${commerce.activite.toLowerCase()} à ${commerce.ville}. Retrait en boutique.`}
+>
+  <main class="conteneur page-commande">
+    <h1>Commander à emporter</h1>
+
+    {envoye ? (
+      <div class="confirmation" role="status">
+        <p><strong>Commande envoyée !</strong></p>
+        <p>Nous vous appelons au besoin pour confirmer le créneau de retrait. À tout de suite place Saint-Aubert.</p>
+        <a class="btn btn--contour" href="/">Retour à l'accueil</a>
+      </div>
+    ) : (
+      <>
+        <p class="aide">
+          Choisissez vos cafés, indiquez l'heure souhaitée : on prépare votre commande pour le retrait en boutique
+          (environ {site.commande.delaiRetrait}). Pas de paiement en ligne, vous réglez sur place.
+        </p>
+
+        <form class="form-commande" method="POST" action={site.commande.formulaireAction}>
+          <input type="hidden" name="_subject" value={`Nouvelle commande – ${commerce.nom}`} />
+          <input type="hidden" name="_next" value={`${site.site.url}/commander/?envoye=1`} />
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
+
+          <fieldset>
+            <legend>Vos coordonnées</legend>
+            <div class="champ">
+              <label for="nom">Nom et prénom</label>
+              <input id="nom" name="nom" type="text" required autocomplete="name" />
+            </div>
+            <div class="champ">
+              <label for="telephone">Téléphone</label>
+              <input id="telephone" name="telephone" type="tel" required autocomplete="tel" />
+            </div>
+            <div class="champ">
+              <label for="retrait">Date et heure de retrait souhaitées</label>
+              <input id="retrait" name="retrait_souhaite" type="text" required placeholder="ex. samedi 29 à 10h" />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Vos cafés</legend>
+            <p class="aide">Cochez ce qui vous intéresse, précisez les quantités dans le champ ci-dessous.</p>
+            <div class="choix-produits">
+              {produitsDispo.map((p) => (
+                <label class="case">
+                  <input type="checkbox" name="produits" value={`${p.cle} (${p.format})`} />
+                  {p.cle} <span class="format">({p.format})</span>
+                </label>
+              ))}
+            </div>
+            <div class="champ">
+              <label for="precisions">Quantités et précisions</label>
+              <textarea id="precisions" name="precisions" placeholder="ex. 2 x Éthiopie moulu filtre, 1 x Grève en grains"></textarea>
+            </div>
+          </fieldset>
+
+          <button class="btn btn--plein" type="submit"><Icone nom="sac" />Envoyer ma commande</button>
+        </form>
+      </>
+    )}
+  </main>
+</Base>
+
+<style>
+  .page-commande { padding: 32px 0 80px; max-width: 640px; }
+  h1 { font-size: clamp(2.2rem, 8vw, 3rem); margin-bottom: 8px; }
+  .aide { color: var(--texte-doux); margin-bottom: 20px; }
+  fieldset { border: 0; padding: 0; margin: 0 0 28px; }
+  legend { font-weight: 700; font-size: 1.15rem; margin-bottom: 12px; padding: 0; font-variation-settings: "wdth" 85; }
+  .champ { display: grid; gap: 6px; margin-bottom: 14px; }
+  label { font-weight: 600; font-size: .92rem; }
+  input[type=text], input[type=tel], textarea {
+    width: 100%; min-height: 48px; padding: 10px 12px; font: inherit; color: var(--torref);
+    background: #fff; border: 1.5px solid #33231c33; border-radius: 6px;
+  }
+  textarea { min-height: 84px; resize: vertical; }
+  input:focus, textarea:focus { outline: none; border-color: var(--baie); box-shadow: 0 0 0 3px #5e717933; }
+
+  .choix-produits { display: grid; gap: 8px; margin-bottom: 14px; }
+  .case { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; background: #fff; border: 1.5px solid #33231c1f; border-radius: 6px; font-weight: 500; }
+  .case input { width: 20px; height: 20px; flex: none; }
+  .case .format { color: var(--texte-doux); font-weight: 400; }
+
+  button[type=submit] { display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; }
+  button :global(svg) { width: 20px; height: 20px; }
+
+  .confirmation { background: #fff; border: 2px solid var(--vert); border-radius: 8px; padding: 24px; display: grid; gap: 10px; }
+  .confirmation strong { font-size: 1.2rem; }
+
+  @media (min-width: 640px) { .choix-produits { grid-template-columns: 1fr 1fr; } }
+</style>

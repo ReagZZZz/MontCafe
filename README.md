@@ -17,15 +17,32 @@ Tout est dans `src/data/site.json` : horaires, téléphone, adresse, cafés/prix
 - Avis Google : mettre à jour `avis.note` et `avis.nombre` de temps en temps.
 - Cafés : `torrefaction` de 1 (très claire) à 5 (foncée), `notes` = 2-3 arômes.
 - `alerteVacances` : bandeau en haut du site, affiché uniquement si le texte n'est pas vide.
+- `commande.formulaireAction` : URL Formspree qui reçoit les commandes (voir ci-dessous).
 
 ## Arborescence
 src/data/site.json            ← toutes les données variables (seul fichier à toucher)
 src/layouts/Base.astro        ← <head> SEO, Open Graph
 src/components/               ← Hero, Avis, Atelier, Carte, Infos, Footer, BarreActions, Schema (JSON-LD), StatutOuverture, Annonce
-src/pages/index.astro         ← page unique
+src/pages/index.astro         ← page d'accueil
+src/pages/commander.astro     ← formulaire de commande à emporter (→ Formspree)
 src/pages/mentions-legales.astro
 src/pages/admin.astro         ← espace boutique de Laurent
 functions/api/admin/[[route]].js  ← backend de l'admin (Cloudflare Pages Function)
+
+## Commande à emporter (`/commander/`)
+Formulaire HTML pur (aucun JavaScript requis, aucune base de données) : il envoie directement un e-mail
+via **Formspree**, conformément au principe KISS du projet (pas de backend pour une simple prise de
+commande sans paiement en ligne).
+
+À faire avant mise en ligne :
+1. Créer un compte gratuit sur [formspree.io](https://formspree.io) avec l'e-mail de Laurent (ou le tien,
+   à transférer ensuite).
+2. Créer un formulaire ("New Form"), copier son URL (`https://formspree.io/f/xxxxxxxx`).
+3. Remplacer `A_CONFIRMER` dans `src/data/site.json > commande.formulaireAction` par cette URL.
+4. Commit + push : Cloudflare Pages republie automatiquement.
+
+Chaque commande (nom, téléphone, créneau de retrait, cafés cochés, précisions) arrive par e-mail à
+Laurent. Pas de paiement en ligne : le client règle au retrait, comme convenu.
 
 ## À valider avec le client avant mise en ligne
 - Adresse boutique : Google indique 5 place Saint-Aubert, le RCS 3 place Saint-Aubert (siège).

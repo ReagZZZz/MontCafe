@@ -35,6 +35,10 @@
     }
   },
   "alerteVacances": "",
+  "commande": {
+    "delaiRetrait": "30 minutes environ",
+    "formulaireAction": "https://formspree.io/f/A_CONFIRMER"
+  },
   "horaires": {
     "lundi": "",
     "mardi": "10:00-12:30, 13:30-19:00",

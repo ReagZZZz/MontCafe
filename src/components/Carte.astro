@@ -3,6 +3,7 @@
 // Chaque café affiche son niveau de torréfaction sur l'échelle de la marque.
 import data from '../data/site.json';
 import { cafes } from '../lib/boutique.js';
+import Icone from './Icone.astro';
 const titre = 'Nos cafés du moment';
 const { intro, categories } = cafes;
 const services = data.services;
@@ -55,6 +56,8 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
     <ul class="services">
       {services.map((s) => <li><h3>{s.titre}</h3><p>{s.texte}</p></li>)}
     </ul>
+
+    <a class="btn btn--plein commander-cta" href="/commander/"><Icone nom="sac" />Commander à emporter</a>
   </div>
 </section>
 
@@ -94,6 +97,10 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
   .services li { background: var(--torref); color: var(--brume); padding: 20px 22px; border-radius: 6px; }
   .services h3 { font-size: 1.2rem; color: var(--t2); }
   .services p { margin-top: 4px; opacity: .85; }
+
+  .commander-cta { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 24px; }
+  .commander-cta :global(svg) { width: 20px; height: 20px; }
+  @media (min-width: 768px) { .commander-cta { width: fit-content; margin-left: auto; margin-right: auto; } }
 
   @media (min-width: 768px) {
     #cat-0:checked ~ .liste[data-i="0"], #cat-1:checked ~ .liste[data-i="1"],

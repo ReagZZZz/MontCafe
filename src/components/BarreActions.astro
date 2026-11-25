@@ -6,23 +6,27 @@ import Icone from './Icone.astro';
 const { itineraire, appel } = liens(data.commerce);
 ---
 <nav class="barre" aria-label="Actions rapides">
-  <a href={appel}><Icone nom="tel" />Appeler</a>
-  <a href={itineraire} target="_blank" rel="noopener"><Icone nom="itineraire" />Itinéraire</a>
+  <a href={appel}><Icone nom="tel" /><span>Appeler</span></a>
+  <a href={itineraire} target="_blank" rel="noopener"><Icone nom="itineraire" /><span>Itinéraire</span></a>
+  <a href="/commander/"><Icone nom="sac" /><span>Commander</span></a>
 </nav>
 
 <style>
   .barre {
     position: fixed; inset: auto 0 0 0; z-index: 50;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
     background: #e9ebe6f2; backdrop-filter: blur(8px);
     border-top: 1px solid #33231c22;
   }
   .barre a {
-    min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px;
-    border-radius: 6px; font-weight: 600; text-decoration: none; background: var(--torref); color: var(--brume); border: 2px solid var(--torref);
+    min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    border-radius: 6px; font-weight: 600; font-size: .88rem; text-decoration: none;
+    background: var(--torref); color: var(--brume); border: 2px solid var(--torref);
+    padding: 0 6px; white-space: nowrap;
   }
   .barre a:first-child { background: transparent; color: var(--torref); }
-  .barre :global(svg) { width: 20px; height: 20px; }
+  .barre :global(svg) { width: 18px; height: 18px; flex: none; }
+  @media (max-width: 360px) { .barre a span { display: none; } }
   @media (min-width: 768px) { .barre { display: none; } }
 </style>
