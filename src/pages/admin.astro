@@ -1,0 +1,412 @@
+---
+// Espace boutique de Laurent : annonce, cafés du moment, horaires.
+// Page statique + appels à l'API /api/admin (netlify/functions/admin.mts).
+import Base from '../layouts/Base.astro';
+---
+<Base titre="Espace boutique – MontCafé" description="Espace d'administration MontCafé" noindex>
+  <!-- ========== Connexion ========== -->
+  <main id="ecran-connexion" class="connexion" hidden>
+    <form id="form-connexion" class="connexion__boite">
+      <p class="logo">MontCafé</p>
+      <h1>Espace boutique</h1>
+      <label for="mdp">Mot de passe</label>
+      <input id="mdp" type="password" autocomplete="current-password" required />
+      <button class="btn btn--plein" type="submit">Se connecter</button>
+      <p class="message" id="msg-connexion" role="alert"></p>
+    </form>
+  </main>
+
+  <!-- ========== Admin ========== -->
+  <div id="ecran-admin" hidden>
+    <header class="entete">
+      <p class="logo logo--petit">MontCafé</p>
+      <nav class="entete__liens">
+        <a href="/" target="_blank" rel="noopener">Voir le site</a>
+        <button type="button" id="deconnexion" class="lien">Se déconnecter</button>
+      </nav>
+    </header>
+
+    <nav class="onglets" aria-label="Rubriques">
+      <button type="button" data-onglet="cafes" aria-pressed="true">Cafés</button>
+      <button type="button" data-onglet="annonce" aria-pressed="false">Annonce</button>
+      <button type="button" data-onglet="horaires" aria-pressed="false">Horaires</button>
+    </nav>
+
+    <main class="contenu">
+      <section data-panneau="cafes"></section>
+      <section data-panneau="annonce" hidden></section>
+      <section data-panneau="horaires" hidden></section>
+    </main>
+
+    <footer class="barre-enregistrer">
+      <p id="etat" role="status">Tout est à jour.</p>
+      <button type="button" id="enregistrer" class="btn btn--plein" disabled>Enregistrer</button>
+    </footer>
+  </div>
+  <p id="chargement" class="chargement">Chargement…</p>
+</Base>
+
+<style is:global>
+  /* Reprise de l'identité du site, en version outil */
+  [hidden] { display: none !important; }
+  .connexion { min-height: 100svh; display: grid; place-items: center; padding: 20px; }
+  .connexion__boite { width: 100%; max-width: 360px; display: grid; gap: 12px; }
+  .logo { font-size: 3.4rem; font-weight: 800; font-variation-settings: "wdth" 75; letter-spacing: -0.045em; line-height: .9; }
+  .logo--petit { font-size: 1.9rem; }
+  .connexion h1 { font-size: 1.2rem; font-weight: 500; color: var(--baie); margin-bottom: 12px; }
+  .message { min-height: 1.4em; color: var(--cerise); font-weight: 600; }
+  .chargement { padding: 40px 20px; text-align: center; color: var(--texte-doux); }
+
+  label, .etiquette { font-weight: 600; font-size: .92rem; display: block; }
+  input[type=text], input[type=password], input[type=time], textarea {
+    width: 100%; min-width: 0; min-height: 48px; padding: 10px 12px; font: inherit; color: var(--torref);
+    background: #fff; border: 1.5px solid #33231c33; border-radius: 6px;
+  }
+  textarea { min-height: 84px; resize: vertical; }
+  input:focus, textarea:focus { outline: none; border-color: var(--baie); box-shadow: 0 0 0 3px #5e717933; }
+  .lien { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+
+  .entete { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px 8px; }
+  .entete__liens { display: flex; gap: 16px; font-size: .92rem; }
+
+  .onglets { position: sticky; top: 0; z-index: 5; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px 20px; background: var(--brume); border-bottom: 2px solid var(--torref); }
+  .onglets button { min-height: 46px; border: 0; border-radius: 6px; background: transparent; font: 600 1rem var(--police); color: var(--torref); }
+  .onglets button[aria-pressed=true] { background: var(--torref); color: var(--brume); }
+  .onglets button .pastille-modif { display: inline-block; width: 7px; height: 7px; margin-left: 6px; border-radius: 50%; background: var(--t2); vertical-align: middle; }
+
+  .contenu { overflow-x: hidden; max-width: 720px; margin: 0 auto; padding: 20px 20px 120px; }
+  .contenu h2 { font-size: 1.9rem; max-width: none; margin-bottom: 6px; }
+  .aide { color: var(--texte-doux); font-size: .95rem; margin-bottom: 18px; }
+  .champ { display: grid; gap: 6px; margin-bottom: 14px; }
+  .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Rayon et cartes café */
+  .rayon { margin-top: 26px; padding-top: 16px; border-top: 2px solid var(--torref); }
+  .rayon__tete { display: flex; gap: 8px; align-items: end; }
+  .rayon__tete .champ { flex: 1; margin: 0; }
+  .carte-cafe { background: #fff; border-radius: 8px; padding: 16px; margin-top: 12px; border: 1.5px solid #33231c1f; }
+  .carte-cafe.epuise { opacity: .55; background: #f4f2ee; }
+  .carte-cafe__tete { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .carte-cafe__tete strong { font-size: 1.25rem; font-variation-settings: "wdth" 85; }
+  .torref { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .torref button { min-height: 44px; border-radius: 6px; border: 2px solid transparent; font: 700 .95rem var(--police); cursor: pointer; opacity: .35; }
+  .torref button[aria-pressed=true] { opacity: 1; border-color: var(--torref); }
+  .torref button:nth-child(1) { background: var(--t1); } .torref button:nth-child(2) { background: var(--t2); }
+  .torref button:nth-child(3) { background: var(--t3); color: #fff; } .torref button:nth-child(4) { background: var(--t4); color: #fff; }
+  .torref button:nth-child(5) { background: var(--t5); color: #fff; }
+  .torref-nom { font-size: .88rem; color: var(--texte-doux); margin-top: 4px; }
+
+  .interrupteur { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 600; cursor: pointer; }
+  .interrupteur input { appearance: none; width: 50px; height: 30px; border-radius: 999px; background: #33231c40; position: relative; cursor: pointer; transition: background .15s; flex: none; }
+  .interrupteur input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  .interrupteur input:checked { background: var(--vert); }
+  .interrupteur input:checked::after { transform: translateX(20px); }
+
+  .btn--petit { min-height: 44px; padding: 0 14px; font-size: .95rem; }
+  .btn--danger { border-color: var(--cerise); color: var(--cerise); background: transparent; }
+  .btn--danger.confirmer { background: var(--cerise); color: #fff; }
+  .ajouter { width: 100%; margin-top: 12px; border-style: dashed; }
+
+  /* Choix du type d'annonce */
+  .choix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .choix button { min-height: 46px; border-radius: 6px; border: 2px solid #33231c33; background: #fff; font: 600 .92rem var(--police); cursor: pointer; }
+  .choix button[aria-pressed=true] { border-color: var(--torref); background: var(--torref); color: var(--brume); }
+  .apercu { margin-top: 8px; border-radius: 6px; overflow: hidden; }
+
+  /* Horaires */
+  .jour { background: #fff; border-radius: 8px; padding: 12px 14px; margin-top: 10px; border: 1.5px solid #33231c1f; }
+  .jour__tete { display: flex; justify-content: space-between; align-items: center; }
+  .jour__tete strong { text-transform: capitalize; font-size: 1.1rem; }
+  .creneau { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 40px; gap: 8px; align-items: center; margin-top: 10px; }
+  .creneau button { width: 40px; height: 44px; border: 0; background: none; font-size: 1.4rem; color: var(--cerise); cursor: pointer; }
+
+  .barre-enregistrer {
+    position: fixed; inset: auto 0 0 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: #e9ebe6f2; backdrop-filter: blur(8px); border-top: 1px solid #33231c22;
+  }
+  .barre-enregistrer p { font-size: .92rem; color: var(--texte-doux); }
+  .barre-enregistrer p.ok { color: var(--vert); font-weight: 600; }
+  .barre-enregistrer p.ko { color: var(--cerise); font-weight: 600; }
+  .barre-enregistrer .btn { flex: none; }
+  .btn:disabled { opacity: .4; cursor: default; }
+  body:has(#ecran-admin:not([hidden])) { padding-bottom: 0; }
+</style>
+
+<script>
+  // ============================================================
+  // Logique de l'admin (aucune dépendance)
+  // Les données sont gardées dans `etat`, les champs écrivent dedans,
+  // et seul ce qui a changé est envoyé à l'API au moment d'enregistrer.
+  // ============================================================
+  const API = '/api/admin';
+  const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Foncée'];
+  const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+  const TONS = [['nouveaute', 'Nouveauté'], ['info', 'Information'], ['fermeture', 'Fermeture']];
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ---------- Session ----------
+  const stock = {
+    get: () => { try { return localStorage.getItem('montcafe-jeton'); } catch { return null; } },
+    set: (v) => { try { v ? localStorage.setItem('montcafe-jeton', v) : localStorage.removeItem('montcafe-jeton'); } catch {} },
+  };
+  let jeton = stock.get();
+
+  async function appel(chemin, options = {}) {
+    const r = await fetch(API + chemin, {
+      ...options,
+      headers: { 'content-type': 'application/json', ...(jeton ? { authorization: `Bearer ${jeton}` } : {}) },
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.status === 401 && chemin !== '/login') { deconnecter(d.erreur); throw new Error(d.erreur); }
+    if (!r.ok) throw new Error(d.erreur || `Erreur ${r.status}`);
+    return d;
+  }
+
+  // ---------- État ----------
+  let etat = null;      // { annonce, cafes, horaires } : contenu modifiable
+  let sha = {};         // version GitHub de chaque fichier
+  let reference = {};   // JSON d'origine pour détecter les modifications
+  let ongletActif = 'cafes';
+
+  const modifie = (nom) => JSON.stringify(etat[nom]) !== reference[nom];
+  const fichiersModifies = () => ['annonce', 'cafes', 'horaires'].filter(modifie);
+
+  function majBarre(message, classe = '') {
+    const liste = fichiersModifies();
+    $('#enregistrer').disabled = liste.length === 0;
+    const p = $('#etat');
+    p.className = classe;
+    p.textContent = message ?? (liste.length ? 'Modifications non enregistrées.' : 'Tout est à jour.');
+    document.querySelectorAll('[data-onglet]').forEach((b) => {
+      b.querySelector('.pastille-modif')?.remove();
+      if (liste.includes(b.dataset.onglet)) b.insertAdjacentHTML('beforeend', '<span class="pastille-modif" aria-label="modifié"></span>');
+    });
+  }
+
+  // ---------- Horaires : "10:00-12:30, 13:30-19:00" <-> [["10:00","12:30"],...] ----------
+  const hNorm = (h) => { const m = String(h).trim().match(/^(\d{1,2})\s*[:hH]?\s*(\d{2})?$/); return m ? `${m[1].padStart(2, '0')}:${m[2] ?? '00'}` : ''; };
+  const versCreneaux = (t) => String(t || '').split(',').map((c) => c.split('-').map(hNorm)).filter(([a, b]) => a && b);
+  const versTexte = (cs) => cs.filter(([a, b]) => a && b).map(([a, b]) => `${a}-${b}`).join(', ');
+  let horairesEdit = {}; // jour -> créneaux (forme éditable)
+
+  // ============================================================
+  // Rendu des panneaux
+  // ============================================================
+  function rendreCafes() {
+    const c = etat.cafes;
+    $('[data-panneau=cafes]').innerHTML = `
+      <h2>Cafés du moment</h2>
+      <p class="aide">Décochez « En rayon » quand un café est épuisé : il disparaît du site sans être effacé.</p>
+      <div class="champ"><label for="intro">Phrase d'introduction</label>
+        <textarea id="intro" data-champ="intro">${esc(c.intro)}</textarea></div>
+      ${c.categories.map((cat, ci) => `
+        <div class="rayon">
+          <div class="rayon__tete">
+            <div class="champ"><label>Rayon</label>
+              <input type="text" value="${esc(cat.nom)}" data-champ="rayon" data-ci="${ci}" /></div>
+            <button type="button" class="btn btn--petit btn--danger" data-action="suppr-rayon" data-ci="${ci}">Supprimer</button>
+          </div>
+          ${cat.produits.map((p, pi) => carteCafe(p, ci, pi)).join('')}
+          <button type="button" class="btn btn--contour btn--petit ajouter" data-action="ajout-cafe" data-ci="${ci}">Ajouter un café</button>
+        </div>`).join('')}
+      <button type="button" class="btn btn--contour ajouter" data-action="ajout-rayon">Ajouter un rayon</button>`;
+  }
+
+  function carteCafe(p, ci, pi) {
+    const d = `data-ci="${ci}" data-pi="${pi}"`;
+    const niveau = Number(p.torrefaction) || 3;
+    return `
+      <div class="carte-cafe ${p.disponible === false ? 'epuise' : ''}">
+        <div class="carte-cafe__tete">
+          <strong>${esc(p.nom) || 'Nouveau café'}</strong>
+          <label class="interrupteur"><input type="checkbox" ${p.disponible !== false ? 'checked' : ''} data-champ="disponible" ${d} /> En rayon</label>
+        </div>
+        <div class="champ"><label>Nom</label><input type="text" value="${esc(p.nom)}" data-champ="nom" ${d} /></div>
+        <div class="champ"><label>Origine ou région</label><input type="text" value="${esc(p.origine)}" data-champ="origine" ${d} /></div>
+        <div class="champ"><label>Arômes, séparés par des virgules</label>
+          <input type="text" value="${esc((p.notes || []).join(', '))}" data-champ="notes" ${d} placeholder="chocolat, noisette" /></div>
+        <div class="champ"><span class="etiquette">Torréfaction</span>
+          <div class="torref" role="group" aria-label="Niveau de torréfaction">
+            ${[1, 2, 3, 4, 5].map((n) => `<button type="button" aria-pressed="${n === niveau}" aria-label="${NIVEAUX[n]}" data-action="torref" data-n="${n}" ${d}>${n}</button>`).join('')}
+          </div>
+          <p class="torref-nom">${NIVEAUX[niveau]}</p></div>
+        <div class="deux">
+          <div class="champ"><label>Prix</label><input type="text" value="${esc(p.prix)}" data-champ="prix" ${d} placeholder="9,50 €" /></div>
+          <div class="champ"><label>Format</label><input type="text" value="${esc(p.format)}" data-champ="format" ${d} placeholder="250 g" /></div>
+        </div>
+        <button type="button" class="btn btn--petit btn--danger" data-action="suppr-cafe" ${d}>Supprimer ce café</button>
+      </div>`;
+  }
+
+  function rendreAnnonce() {
+    const a = etat.annonce;
+    $('[data-panneau=annonce]').innerHTML = `
+      <h2>Annonce</h2>
+      <p class="aide">Un bandeau en haut du site : arrivage, nouveauté, fermeture exceptionnelle…</p>
+      <label class="interrupteur"><input type="checkbox" ${a.actif ? 'checked' : ''} data-champ="annonce-actif" /> Afficher l'annonce</label>
+      <div class="champ" style="margin-top:14px"><span class="etiquette">Type</span>
+        <div class="choix">${TONS.map(([v, l]) => `<button type="button" aria-pressed="${a.ton === v}" data-action="ton" data-v="${v}">${l}</button>`).join('')}</div></div>
+      <div class="champ"><label for="txt-annonce">Texte</label>
+        <input id="txt-annonce" type="text" maxlength="160" value="${esc(a.texte)}" data-champ="annonce-texte" placeholder="Arrivage Kenya cette semaine !" /></div>
+      <span class="etiquette">Aperçu</span>
+      <div class="apercu" id="apercu-annonce"></div>`;
+    majApercu();
+  }
+
+  function majApercu() {
+    const a = etat.annonce, el = $('#apercu-annonce');
+    if (!el) return;
+    const couleurs = { nouveaute: ['var(--torref)', 'var(--t1)'], info: ['var(--torref)', 'var(--greve)'], fermeture: ['var(--cerise)', 'var(--brume)'] }[a.ton] || ['var(--torref)', 'var(--greve)'];
+    const label = Object.fromEntries(TONS)[a.ton] || 'Info';
+    el.innerHTML = a.actif && a.texte
+      ? `<p style="background:${couleurs[0]};color:var(--brume);padding:12px 14px"><strong style="background:${couleurs[1]};color:var(--torref);padding:1px 9px;border-radius:999px;font-size:.85rem;margin-right:8px">${esc(label)}</strong>${esc(a.texte)}</p>`
+      : `<p class="aide" style="margin:0">L'annonce n'est pas affichée sur le site.</p>`;
+  }
+
+  function rendreHoraires() {
+    $('[data-panneau=horaires]').innerHTML = `
+      <h2>Horaires</h2>
+      <p class="aide">Pour une fermeture ponctuelle (congés, jour férié), utilisez plutôt l'annonce.</p>
+      ${JOURS.map((j) => {
+        const cs = horairesEdit[j];
+        return `<div class="jour">
+          <div class="jour__tete"><strong>${j}</strong>
+            <label class="interrupteur"><input type="checkbox" ${cs.length ? 'checked' : ''} data-action="ouvert" data-j="${j}" /> ${cs.length ? 'Ouvert' : 'Fermé'}</label></div>
+          ${cs.map(([a, b], i) => `<div class="creneau">
+              <input type="time" value="${a}" data-champ="h" data-j="${j}" data-i="${i}" data-k="0" aria-label="Ouverture" />
+              <span>à</span>
+              <input type="time" value="${b}" data-champ="h" data-j="${j}" data-i="${i}" data-k="1" aria-label="Fermeture" />
+              <button type="button" data-action="suppr-creneau" data-j="${j}" data-i="${i}" aria-label="Retirer ce créneau">×</button>
+            </div>`).join('')}
+          ${cs.length && cs.length < 3 ? `<button type="button" class="lien" style="margin-top:10px" data-action="ajout-creneau" data-j="${j}">Ajouter une coupure</button>` : ''}
+        </div>`;
+      }).join('')}`;
+  }
+
+  const syncHoraires = () => { for (const j of JOURS) etat.horaires[j] = versTexte(horairesEdit[j]); };
+
+  // ============================================================
+  // Événements (délégués)
+  // ============================================================
+  document.addEventListener('input', (e) => {
+    const el = e.target, ch = el.dataset?.champ;
+    if (!ch || !etat) return;
+    const { ci, pi } = el.dataset;
+    if (ch === 'intro') etat.cafes.intro = el.value;
+    else if (ch === 'rayon') etat.cafes.categories[ci].nom = el.value;
+    else if (pi !== undefined) {
+      const p = etat.cafes.categories[ci].produits[pi];
+      if (ch === 'notes') p.notes = el.value.split(',').map((s) => s.trim()).filter(Boolean);
+      else if (ch === 'disponible') { p.disponible = el.checked; el.closest('.carte-cafe').classList.toggle('epuise', !el.checked); }
+      else { p[ch] = el.value; if (ch === 'nom') el.closest('.carte-cafe').querySelector('strong').textContent = el.value || 'Nouveau café'; }
+    }
+    else if (ch === 'annonce-actif') { etat.annonce.actif = el.checked; majApercu(); }
+    else if (ch === 'annonce-texte') { etat.annonce.texte = el.value; majApercu(); }
+    else if (ch === 'h') { horairesEdit[el.dataset.j][el.dataset.i][el.dataset.k] = el.value; syncHoraires(); }
+    majBarre();
+  });
+
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-action], [data-onglet]');
+    if (!b || !etat) return;
+    if (b.dataset.onglet) return changerOnglet(b.dataset.onglet);
+    const { action, ci, pi, j, i } = b.dataset;
+    const cats = etat.cafes.categories;
+
+    // Suppression en deux temps (pas de fenêtre de confirmation)
+    if (action?.startsWith('suppr-rayon') || action === 'suppr-cafe') {
+      if (!b.classList.contains('confirmer')) {
+        b.classList.add('confirmer'); const t = b.textContent; b.textContent = 'Confirmer la suppression';
+        setTimeout(() => { b.classList.remove('confirmer'); b.textContent = t; }, 3000);
+        return;
+      }
+      if (action === 'suppr-rayon') cats.splice(ci, 1); else cats[ci].produits.splice(pi, 1);
+      rendreCafes();
+    }
+    else if (action === 'torref') { cats[ci].produits[pi].torrefaction = b.dataset.n; rendreCafes(); }
+    else if (action === 'ajout-cafe') {
+      cats[ci].produits.push({ nom: '', origine: '', notes: [], torrefaction: '3', prix: '', format: '250 g', disponible: true });
+      rendreCafes();
+      const cartes = document.querySelectorAll(`.carte-cafe input[data-ci="${ci}"][data-champ=nom]`);
+      cartes[cartes.length - 1]?.focus();
+    }
+    else if (action === 'ajout-rayon') { cats.push({ nom: 'Nouveau rayon', produits: [] }); rendreCafes(); }
+    else if (action === 'ton') { etat.annonce.ton = b.dataset.v; rendreAnnonce(); }
+    else if (action === 'ouvert') { horairesEdit[j] = b.checked ? [['10:00', '19:00']] : []; syncHoraires(); rendreHoraires(); }
+    else if (action === 'ajout-creneau') { horairesEdit[j].push(['14:00', '19:00']); syncHoraires(); rendreHoraires(); }
+    else if (action === 'suppr-creneau') { horairesEdit[j].splice(i, 1); syncHoraires(); rendreHoraires(); }
+    majBarre();
+  });
+
+  function changerOnglet(nom) {
+    ongletActif = nom;
+    document.querySelectorAll('[data-onglet]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.onglet === nom)));
+    document.querySelectorAll('[data-panneau]').forEach((p) => (p.hidden = p.dataset.panneau !== nom));
+    window.scrollTo({ top: 0 });
+  }
+
+  // ---------- Enregistrer ----------
+  $('#enregistrer').addEventListener('click', async () => {
+    const liste = fichiersModifies();
+    const bouton = $('#enregistrer');
+    bouton.disabled = true; majBarre('Enregistrement…');
+    try {
+      for (const nom of liste) {
+        const r = await appel(`/donnees/${nom}`, { method: 'PUT', body: JSON.stringify({ contenu: etat[nom], sha: sha[nom] }) });
+        sha[nom] = r.sha; etat[nom] = r.contenu; reference[nom] = JSON.stringify(r.contenu);
+      }
+      chargerHorairesEdit(); rendreTout();
+      majBarre('Enregistré. Le site sera à jour dans une minute environ.', 'ok');
+    } catch (err) {
+      majBarre(err.message, 'ko');
+    }
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (etat && fichiersModifies().length) e.preventDefault(); });
+
+  // ---------- Démarrage ----------
+  function chargerHorairesEdit() { horairesEdit = Object.fromEntries(JOURS.map((j) => [j, versCreneaux(etat.horaires[j])])); }
+  function rendreTout() { rendreCafes(); rendreAnnonce(); rendreHoraires(); }
+
+  function afficher(ecran) {
+    $('#chargement').hidden = true;
+    $('#ecran-connexion').hidden = ecran !== 'connexion';
+    $('#ecran-admin').hidden = ecran !== 'admin';
+  }
+
+  function deconnecter(message) {
+    jeton = null; stock.set(null); etat = null;
+    afficher('connexion');
+    $('#msg-connexion').textContent = message || '';
+  }
+  $('#deconnexion').addEventListener('click', () => deconnecter());
+
+  async function charger() {
+    try {
+      const d = await appel('/donnees');
+      etat = {}; sha = {}; reference = {};
+      for (const nom of ['annonce', 'cafes', 'horaires']) {
+        etat[nom] = d[nom].contenu; sha[nom] = d[nom].sha; reference[nom] = JSON.stringify(d[nom].contenu);
+      }
+      etat.cafes.categories ??= [];
+      chargerHorairesEdit(); rendreTout(); changerOnglet(ongletActif);
+      afficher('admin'); majBarre();
+    } catch (err) {
+      if (jeton) { afficher('connexion'); $('#msg-connexion').textContent = err.message; }
+    }
+  }
+
+  $('#form-connexion').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('#msg-connexion'); msg.textContent = 'Connexion…';
+    try {
+      const d = await appel('/login', { method: 'POST', body: JSON.stringify({ motDePasse: $('#mdp').value }) });
+      jeton = d.jeton; stock.set(jeton); $('#mdp').value = ''; msg.textContent = '';
+      await charger();
+    } catch (err) { msg.textContent = err.message; }
+  });
+
+  if (jeton) charger(); else afficher('connexion');
+</script>

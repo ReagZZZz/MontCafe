@@ -7,7 +7,7 @@ Palette de la baie (brume, grève, ardoise) + échelle de torréfaction du grain
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère dist/
-# Mise en ligne : chaque push sur main publie automatiquement sur GitHub Pages (.github/workflows/pages.yml)
+# Mise en ligne : Netlify, relié au dépôt GitHub ; chaque push sur main republie le site
 
 ## Modifier le contenu (30 secondes)
 Tout est dans `src/data/data.json` : horaires, téléphone, adresse, cafés/prix, réseaux, mentions légales.
@@ -30,12 +30,14 @@ src/pages/mentions-legales.astro
 - E-mail, n° TVA intracom, comptes Instagram/Facebook, vraie photo, nom de domaine (data.json > site.url + public/robots.txt).
 
 ## Espace admin (Laurent)
-Outil : Pages CMS (https://app.pagescms.org), configuré par `.pages.yml` à la racine. `/admin/` redirige vers lui.
-Laurent y modifie : l'annonce du bandeau, les cafés du moment (« En rayon » pour masquer un café épuisé) et les horaires.
-Ces données sont dans `src/data/boutique/*.json` ; `data.json` (mentions légales, SEO, coordonnées) n'est pas exposé.
-Chaque enregistrement crée un commit sur `main` → le workflow republie le site en ~1 minute.
+Adresse : `/admin/` (page `src/pages/admin.astro`), connexion par simple mot de passe, session de 30 jours.
+Laurent y gère : les cafés du moment (« En rayon » pour masquer un café épuisé), l'annonce du bandeau et les horaires.
 
-Mise en place (Paul, une fois) :
-1. app.pagescms.org > se connecter avec GitHub > installer l'appli GitHub sur le dépôt MontCafe.
-2. Ouvrir le dépôt dans Pages CMS > Collaborateurs > inviter l'e-mail de Laurent.
-3. Laurent reçoit un e-mail et se connecte avec ce même e-mail : pas de compte GitHub.
+Fonctionnement : la page appelle `netlify/functions/admin.mts` (route `/api/admin/*`), qui vérifie le mot de passe,
+puis lit/écrit uniquement `src/data/boutique/*.json` sur GitHub. Chaque enregistrement = 1 commit sur `main`
+→ Netlify republie le site (~1 min). `data.json` (mentions légales, SEO, coordonnées) n'est jamais exposé.
+
+Variables Netlify (Project configuration > Environment variables, portée Functions incluse) :
+- `ADMIN_PASSWORD` : mot de passe de Laurent (le changer déconnecte toutes les sessions)
+- `GITHUB_TOKEN` : jeton GitHub fine-grained, dépôt MontCafe uniquement, permission Contents : Read and write
+- `GITHUB_REPO` / `GITHUB_BRANCH` : optionnels (défauts `ReagZZZz/MontCafe` / `main`)

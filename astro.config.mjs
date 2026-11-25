@@ -12,6 +12,6 @@ export default defineConfig({
   base: ghPages ? '/MontCafe/' : '/',
   trailingSlash: 'always',
   output: 'static',
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !page.includes('/admin') })],
   build: { inlineStylesheets: 'always' }, // CSS inliné : zéro requête bloquante
 });
