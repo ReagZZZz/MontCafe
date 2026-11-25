@@ -17,6 +17,7 @@ const envoye = Astro.url.searchParams.get('envoye') === '1';
   description={`Passez votre commande de café à emporter chez ${commerce.nom}, ${commerce.activite.toLowerCase()} à ${commerce.ville}. Retrait en boutique.`}
 >
   <main class="conteneur page-commande">
+    <a class="retour" href="/">← Retour au site</a>
     <h1>Commander à emporter</h1>
 
     {envoye ? (
@@ -79,6 +80,8 @@ const envoye = Astro.url.searchParams.get('envoye') === '1';
 
 <style>
   .page-commande { padding: 32px 0 80px; max-width: 640px; }
+  .retour { display: inline-block; margin-bottom: 18px; color: var(--baie); font-weight: 600; text-decoration: none; }
+  .retour:hover { text-decoration: underline; }
   h1 { font-size: clamp(2.2rem, 8vw, 3rem); margin-bottom: 8px; }
   .aide { color: var(--texte-doux); margin-bottom: 20px; }
   fieldset { border: 0; padding: 0; margin: 0 0 28px; }

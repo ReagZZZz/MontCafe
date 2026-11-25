@@ -13,6 +13,7 @@ import Base from '../layouts/Base.astro';
       <input id="mdp" type="password" autocomplete="current-password" required />
       <button class="btn btn--plein" type="submit">Se connecter</button>
       <p class="message" id="msg-connexion" role="alert"></p>
+      <a class="retour" href="/">← Retour au site</a>
     </form>
   </main>
 
@@ -55,6 +56,8 @@ import Base from '../layouts/Base.astro';
   .logo--petit { font-size: 1.9rem; }
   .connexion h1 { font-size: 1.2rem; font-weight: 500; color: var(--baie); margin-bottom: 12px; }
   .message { min-height: 1.4em; color: var(--cerise); font-weight: 600; }
+  .retour { display: block; text-align: center; margin-top: 8px; color: var(--baie); font-weight: 600; text-decoration: none; }
+  .retour:hover { text-decoration: underline; }
   .chargement { padding: 40px 20px; text-align: center; color: var(--texte-doux); }
 
   label, .etiquette { font-weight: 600; font-size: .92rem; display: block; }

@@ -1,0 +1,38 @@
+---
+// Section photo : humanise le site juste après le hero (identité
+// chaleureuse, pas seulement des illustrations vectorielles).
+import { Image } from 'astro:assets';
+import photo from '../assets/atelier-laurent.jpg';
+import data from '../data/site.json';
+const c = data.commerce;
+---
+<section class="portrait" aria-labelledby="titre-portrait">
+  <div class="conteneur portrait__grille">
+    <figure class="portrait__photo">
+      <Image
+        src={photo}
+        alt={`Dans l'atelier de torréfaction ${c.nom}, devant le torréfacteur, avec des sachets de café fraîchement conditionnés`}
+        widths={[480, 960]}
+        sizes="(min-width: 900px) 480px, 100vw"
+        loading="lazy"
+      />
+    </figure>
+    <div class="portrait__texte">
+      <h2 id="titre-portrait">Torréfié ici, par Laurent</h2>
+      <p>Pas de sous-traitance : le grain vert arrive place Saint-Aubert, Laurent le torréfie lui-même, fournée après fournée, dans cet atelier.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .portrait { background: var(--brume); padding: 48px 0; }
+  .portrait__grille { display: grid; gap: 24px; align-items: center; }
+  .portrait__photo { margin: 0; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px -10px #33231c40; }
+  .portrait__photo :global(img) { display: block; width: 100%; height: auto; }
+  .portrait__texte h2 { font-size: clamp(1.8rem, 6vw, 2.4rem); font-variation-settings: "wdth" 80; margin-bottom: 10px; }
+  .portrait__texte p { color: var(--texte-doux); max-width: 44ch; }
+
+  @media (min-width: 900px) {
+    .portrait__grille { grid-template-columns: 1fr 1fr; gap: 48px; }
+  }
+</style>
