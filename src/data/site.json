@@ -3,15 +3,15 @@
   "site": {
     "url": "https://montcafe.nngk5grnnv.workers.dev",
     "titre": "MontCafé – Torréfacteur artisanal à Avranches",
-    "description": "MontCafé, torréfacteur artisanal place Saint-Aubert à Avranches. Cafés de spécialité torréfiés sur place, en grains ou moulus. Dégustation offerte en boutique.",
+    "description": "Je torréfie mes cafés de spécialité place Saint-Aubert à Avranches, en grains ou moulus. Dégustation offerte en boutique.",
     "langue": "fr"
   },
   "commerce": {
     "nom": "MontCafé",
     "activite": "Torréfacteur",
     "ville": "Avranches",
-    "slogan": "Le café torréfié place Saint-Aubert, face à la baie.",
-    "sousSlogan": "Laurent torréfie ses grains en petites fournées, lentement, à basse température. Passez goûter avant de choisir : la dégustation est offerte.",
+    "slogan": "Mon café, torréfié place Saint-Aubert, face à la baie.",
+    "sousSlogan": "Je torréfie mes grains en petites fournées, lentement, à basse température. Passez goûter avant de choisir : la dégustation est offerte.",
     "telephone": "+33672175143",
     "telephoneAffiche": "06 72 17 51 43",
     "email": "A_CONFIRMER",
@@ -49,7 +49,7 @@
     "dimanche": ""
   },
   "carte": {
-    "intro": "En grains ou moulus à la demande, pour l'espresso, le filtre, le piston ou l'italienne. La gamme tourne au fil des arrivages.",
+    "intro": "Je les prépare en grains ou moulus à la demande, pour l'espresso, le filtre, le piston ou l'italienne. Ma gamme tourne au fil des arrivages.",
     "categories": [
       {
         "nom": "Origines",
@@ -126,15 +126,15 @@
   "atelier": {
     "titre": "Du grain vert à votre tasse",
     "etapes": [
-      { "titre": "Le choix du grain vert", "texte": "Des cafés de spécialité sélectionnés par origine, achetés crus." },
-      { "titre": "Une torréfaction lente", "texte": "Petites fournées, température douce : les arômes se développent sans amertume." },
-      { "titre": "Le repos", "texte": "Le grain dégaze quelques jours avant d'arriver en rayon, au meilleur de sa fraîcheur." },
-      { "titre": "La mouture à la demande", "texte": "En grains ou moulu devant vous, réglé pour votre cafetière." }
+      { "titre": "Le choix du grain vert", "texte": "Je sélectionne des cafés de spécialité par origine, achetés crus." },
+      { "titre": "Une torréfaction lente", "texte": "Je torréfie en petites fournées, à température douce : les arômes se développent sans amertume." },
+      { "titre": "Le repos", "texte": "Je laisse le grain dégazer quelques jours avant qu'il arrive en rayon, au meilleur de sa fraîcheur." },
+      { "titre": "La mouture à la demande", "texte": "Je le sers en grains ou moulu devant vous, réglé pour votre cafetière." }
     ]
   },
   "services": [
     { "titre": "Dégustation offerte", "texte": "Goûtez les cafés du moment avant d'acheter." },
-    { "titre": "Mouture sur place", "texte": "Espresso, filtre, piston, italienne : dites-nous votre machine." }
+    { "titre": "Mouture sur place", "texte": "Espresso, filtre, piston, italienne : dites-moi votre machine." }
   ],
   "mentionsLegales": {
     "raisonSociale": "MONTCAFÉ",

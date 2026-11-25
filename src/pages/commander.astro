@@ -23,13 +23,13 @@ const envoye = Astro.url.searchParams.get('envoye') === '1';
     {envoye ? (
       <div class="confirmation" role="status">
         <p><strong>Commande envoyée !</strong></p>
-        <p>Nous vous appelons au besoin pour confirmer le créneau de retrait. À tout de suite place Saint-Aubert.</p>
+        <p>Je vous appelle au besoin pour confirmer le créneau de retrait. À tout de suite place Saint-Aubert.</p>
         <a class="btn btn--contour" href="/">Retour à l'accueil</a>
       </div>
     ) : (
       <>
         <p class="aide">
-          Choisissez vos cafés, indiquez l'heure souhaitée : on prépare votre commande pour le retrait en boutique
+          Choisissez vos cafés, indiquez l'heure souhaitée : je prépare votre commande pour le retrait en boutique
           (environ {site.commande.delaiRetrait}). Pas de paiement en ligne, vous réglez sur place.
         </p>
 
