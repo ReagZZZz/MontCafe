@@ -30,8 +30,8 @@
     "lienGoogleMaps": "https://www.google.com/maps/place/?q=place_id:ChIJl2GeUQBVCUgRcZ8ZmKo9tyU",
     "prix": "€",
     "reseaux": {
-      "instagram": "",
-      "facebook": ""
+      "instagram": "https://www.instagram.com/montcafe_avranches",
+      "facebook": "https://www.facebook.com/share/1KQyaQ8MTW/"
     }
   },
   "alerteVacances": "Fermé",
