@@ -7,7 +7,8 @@ Palette de la baie (brume, grève, ardoise) + échelle de torréfaction du grain
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère dist/
-# Mise en ligne : Cloudflare Pages, relié au dépôt GitHub ; chaque push sur main republie le site
+# Mise en ligne : Cloudflare Worker (assets + API), relié au dépôt GitHub ; chaque push sur main republie le site
+npx wrangler dev   # pour tester le Worker en local (site + /api/admin/*)
 
 ## Modifier le contenu (30 secondes)
 Tout est dans `src/data/site.json` : horaires, téléphone, adresse, cafés/prix, réseaux, mentions légales.
@@ -27,7 +28,9 @@ src/pages/index.astro         ← page d'accueil
 src/pages/commander.astro     ← formulaire de commande à emporter (→ Formspree)
 src/pages/mentions-legales.astro
 src/pages/admin.astro         ← espace boutique de Laurent
-functions/api/admin/[[route]].js  ← backend de l'admin (Cloudflare Pages Function)
+worker/index.js               ← point d'entrée du Worker (sert dist/ + route /api/admin/*)
+worker/admin.js                ← backend de l'admin (lecture/écriture GitHub)
+wrangler.jsonc                 ← config du Worker (assets, nom, date de compatibilité)
 
 ## Commande à emporter (`/commander/`)
 Formulaire HTML pur (aucun JavaScript requis, aucune base de données) : il envoie directement un e-mail
@@ -54,15 +57,26 @@ Adresse : `/admin/` (page `src/pages/admin.astro`), connexion par simple mot de 
 Laurent y gère : les cafés du moment (« En rayon » pour masquer un café épuisé), l'alerte/bandeau et les horaires.
 Il n'a jamais besoin d'un compte GitHub.
 
-Fonctionnement : la page appelle `functions/api/admin/[[route]].js` (route `/api/admin/*`, Cloudflare Pages
-Function), qui vérifie le mot de passe puis lit/écrit `src/data/site.json` sur GitHub via son API. Chaque
-enregistrement = 1 commit sur `main` → Cloudflare Pages republie le site (~30 s).
+Fonctionnement : la page appelle `/api/admin/*`, intercepté par `worker/index.js` et traité par
+`worker/admin.js`, qui vérifie le mot de passe puis lit/écrit `src/data/site.json` sur GitHub via son API.
+Chaque enregistrement = 1 commit sur `main` → le Worker republie le site au prochain déploiement (déclenché
+par le push, ~30 s).
 
-## Déploiement Cloudflare Pages
-1. Sur dash.cloudflare.com → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → dépôt `ReagZZZz/montcafe`, branche `main`.
-2. Build command : `npm run build` · Build output directory : `dist`.
-3. **Settings → Environment variables** (Production **et** Preview si besoin) :
-   - `ADMIN_PASSWORD` : mot de passe de Laurent (le changer déconnecte toutes les sessions)
-   - `GITHUB_TOKEN` : jeton GitHub fine-grained, dépôt `montcafe` uniquement, permission **Contents: Read and write** — cocher « Encrypt »
-   - `GITHUB_REPO` / `GITHUB_BRANCH` : optionnels (défauts `ReagZZZz/montcafe` / `main`)
-4. Déployer. Les fonctions dans `functions/` sont détectées automatiquement par Cloudflare Pages, aucune config supplémentaire.
+## Déploiement (Cloudflare Worker)
+Cloudflare a fusionné Pages et Workers : ce projet est déployé comme un **Worker avec assets statiques**
+(domaine `*.workers.dev` ou domaine perso), pas comme un projet « Pages » classique.
+
+1. Sur dash.cloudflare.com → **Workers & Pages** → **Create** → **Import a repository** (ou « Connect to Git »
+   selon la version de l'interface) → dépôt `ReagZZZz/MontCafe`, branche `main`.
+2. Build command : `npm run build` (génère `dist/`). Le fichier `wrangler.jsonc` à la racine indique à
+   Cloudflare où sont les assets (`dist/`) et le code du Worker (`worker/index.js`) — à vérifier dans
+   **Settings → Build** que la commande de déploiement utilise bien `wrangler deploy` (c'est la valeur par
+   défaut quand un `wrangler.jsonc` est détecté).
+3. **Settings → Variables and Secrets** :
+   - `ADMIN_PASSWORD` : mot de passe de Laurent (le changer déconnecte toutes les sessions) — type **Secret**
+   - `GITHUB_TOKEN` : jeton GitHub fine-grained, dépôt `MontCafe` uniquement, permission **Contents: Read and write** — type **Secret**
+   - `GITHUB_REPO` / `GITHUB_BRANCH` : optionnels (défauts `ReagZZZz/montcafe` / `main`) — type **Text**
+4. Déployer. Teste ensuite `/admin/` (connexion) et `/commander/` (envoi d'une commande test).
+
+Pour tester en local avant de pousser : créer un fichier `.dev.vars` (jamais commité) avec
+`ADMIN_PASSWORD=...` et `GITHUB_TOKEN=...`, puis `npx wrangler dev`.

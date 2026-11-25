@@ -1,7 +1,6 @@
-// Fonction Cloudflare Pages : backend de /admin/.
-// Laurent se connecte par mot de passe, les modifications sont écrites
-// directement dans src/data/site.json via l'API GitHub (pas de base de
-// données, conformément aux principes KISS du projet).
+// Backend de /admin/ : Laurent se connecte par mot de passe, les
+// modifications sont écrites directement dans src/data/site.json via
+// l'API GitHub (pas de base de données, conforme au principe KISS).
 
 const CHEMIN_SITE = 'src/data/site.json';
 const DUREE_SESSION = 30 * 24 * 3600 * 1000; // 30 jours
@@ -81,7 +80,7 @@ const ecrireSite = async (env, contenu, sha) => {
       content: b64,
       sha,
       branch: branche(env),
-    }, null, 0),
+    }),
     headers: { 'content-type': 'application/json' },
   });
   if (r.status === 409 || r.status === 422) return { conflit: true };
@@ -123,9 +122,7 @@ const nettoyer = {
 };
 
 // ---------- Routeur ----------
-export async function onRequest(context) {
-  const { request, env } = context;
-
+export async function handleAdmin(request, env) {
   if (!env.ADMIN_PASSWORD || !env.GITHUB_TOKEN) {
     return erreur("L'espace admin n'est pas encore configuré (variables ADMIN_PASSWORD et GITHUB_TOKEN).", 503);
   }

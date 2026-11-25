@@ -1,7 +1,7 @@
 {
   "_lisezMoi": "Toutes les données variables du site sont ici. Le bandeau (alerteVacances), les horaires et la carte se gèrent aussi depuis /admin/.",
   "site": {
-    "url": "https://montcafe-avranches.pages.dev",
+    "url": "https://montcafe.nngk5grnnv.workers.dev",
     "titre": "MontCafé – Torréfacteur artisanal à Avranches",
     "description": "MontCafé, torréfacteur artisanal place Saint-Aubert à Avranches. Cafés de spécialité torréfiés sur place, en grains ou moulus. Dégustation offerte en boutique.",
     "langue": "fr"
