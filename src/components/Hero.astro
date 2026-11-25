@@ -3,7 +3,7 @@
 // puis la baie du Mont dessinée en SVG (aucune image à charger)
 // et la bande de torréfaction qui se "torréfie" au chargement.
 import Icone from './Icone.astro';
-import data from '../data/data.json';
+import data from '../data/site.json';
 import { liens } from '../lib/liens.js';
 
 const c = data.commerce;
@@ -19,8 +19,8 @@ const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 7
         <span class="hero__nom">{c.nom}</span>
         <span class="hero__metier">{c.activite} à {c.ville}</span>
       </h1>
-      <p class="hero__accroche">{c.accroche}</p>
-      <p class="hero__sous">{c.sousAccroche}</p>
+      <p class="hero__accroche">{c.slogan}</p>
+      <p class="hero__sous">{c.sousSlogan}</p>
       <div class="hero__actions">
         <a class="btn btn--plein" href={itineraire} target="_blank" rel="noopener"><Icone nom="itineraire" />Voir l'itinéraire</a>
         <a class="btn btn--contour" href={appel}><Icone nom="tel" />Appeler {c.telephoneAffiche}</a>

@@ -1,18 +1,14 @@
 ---
-// Bandeau d'annonce en haut de page, activé/désactivé par Laurent dans /admin/
+// Bandeau d'alerte / vacances en haut de page, édité par Laurent dans /admin/
 import { annonce } from '../lib/boutique.js';
-const TONS = { nouveaute: 'Nouveau', info: 'Info', fermeture: 'Fermeture' };
 ---
 {annonce && (
-  <aside class={`annonce annonce--${annonce.ton ?? 'info'}`} role="status">
-    <p class="conteneur"><strong>{TONS[annonce.ton] ?? 'Info'}</strong> {annonce.texte}</p>
+  <aside class="annonce" role="status">
+    <p class="conteneur"><strong>Info</strong> {annonce.texte}</p>
   </aside>
 )}
 
 <style>
   .annonce { padding: 12px 0; font-size: .98rem; line-height: 1.4; background: var(--torref); color: var(--brume); }
   .annonce strong { display: inline-block; margin-right: 8px; padding: 1px 9px; border-radius: 999px; font-size: .85rem; background: var(--t1); color: var(--torref); }
-  .annonce--fermeture { background: var(--cerise); }
-  .annonce--fermeture strong { background: var(--brume); }
-  .annonce--info strong { background: var(--greve); }
 </style>

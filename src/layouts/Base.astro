@@ -2,7 +2,7 @@
 // Layout commun : <head> SEO complet (meta, Open Graph, canonical) + styles globaux
 import '@fontsource-variable/bricolage-grotesque/wdth.css'; // police auto-hébergée (aucun appel à Google Fonts)
 import '../styles/global.css';
-import data from '../data/data.json';
+import data from '../data/site.json';
 
 interface Props { titre?: string; description?: string; noindex?: boolean }
 const { titre = data.site.titre, description = data.site.description, noindex = false } = Astro.props;

@@ -1,5 +1,5 @@
 // Utilitaires horaires : conversion pour l'affichage et pour Schema.org
-// Les données viennent de src/data/data.json
+// Les données viennent de src/data/site.json
 
 const JOURS_SCHEMA = {
   lundi: 'Monday', mardi: 'Tuesday', mercredi: 'Wednesday', jeudi: 'Thursday',

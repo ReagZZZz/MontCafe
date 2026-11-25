@@ -1,9 +1,8 @@
 // Lecture et nettoyage des données gérées par Laurent depuis /admin/
-// (src/data/boutique/*.json). Tout ce que l'admin produit passe par ici,
-// pour qu'une saisie imparfaite ne casse jamais le site.
-import horairesBruts from '../data/boutique/horaires.json';
-import cafesBruts from '../data/boutique/cafes.json';
-import annonceBrute from '../data/boutique/annonce.json';
+// (src/data/site.json : horaires, carte, alerteVacances). Tout ce que
+// l'admin produit passe par ici, pour qu'une saisie imparfaite ne casse
+// jamais le site.
+import site from '../data/site.json';
 
 const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 
@@ -21,12 +20,12 @@ const creneaux = (texte = '') =>
     .filter(([a, b]) => a && b);
 
 /** Horaires de la semaine, lundi -> dimanche */
-export const horaires = JOURS.map((jour) => ({ jour, creneaux: creneaux(horairesBruts[jour]) }));
+export const horaires = JOURS.map((jour) => ({ jour, creneaux: creneaux(site.horaires?.[jour]) }));
 
 /** Cafés : on n'affiche que ceux "en rayon", et les catégories non vides */
 export const cafes = {
-  intro: cafesBruts.intro ?? '',
-  categories: (cafesBruts.categories ?? [])
+  intro: site.carte?.intro ?? '',
+  categories: (site.carte?.categories ?? [])
     .map((cat) => ({
       nom: cat.nom,
       produits: (cat.produits ?? [])
@@ -40,5 +39,13 @@ export const cafes = {
     .filter((cat) => cat.nom && cat.produits.length),
 };
 
-/** Bandeau d'annonce (null si désactivé ou vide) */
-export const annonce = annonceBrute.actif && annonceBrute.texte?.trim() ? annonceBrute : null;
+/** Bandeau d'alerte / vacances (null si vide) */
+export const annonce = site.alerteVacances?.trim() ? { texte: site.alerteVacances.trim() } : null;
+
+/** Infos fixes du commerce + SEO + mentions légales */
+export const commerce = site.commerce;
+export const infosSite = site.site;
+export const mentionsLegales = site.mentionsLegales;
+export const avis = site.avis;
+export const atelier = site.atelier;
+export const services = site.services;

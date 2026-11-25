@@ -1,4 +1,4 @@
-# MontCafé – site vitrine (Astro statique)
+# MontCafé – site vitrine (Astro statique + Tailwind)
 
 ## Identité
 Palette de la baie (brume, grève, ardoise) + échelle de torréfaction du grain vert au grain foncé, utilisée comme signature (bande du hero, niveaux des cafés, étapes de l'atelier). Police : Bricolage Grotesque auto-hébergée.
@@ -7,37 +7,45 @@ Palette de la baie (brume, grève, ardoise) + échelle de torréfaction du grain
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # génère dist/
-# Mise en ligne : Netlify, relié au dépôt GitHub ; chaque push sur main republie le site
+# Mise en ligne : Cloudflare Pages, relié au dépôt GitHub ; chaque push sur main republie le site
 
 ## Modifier le contenu (30 secondes)
-Tout est dans `src/data/data.json` : horaires, téléphone, adresse, cafés/prix, réseaux, mentions légales.
+Tout est dans `src/data/site.json` : horaires, téléphone, adresse, cafés/prix, réseaux, mentions légales.
 - Un prix à "A_CONFIRMER" est masqué automatiquement sur le site.
 - Réseaux : renseigner l'URL Instagram/Facebook → l'icône apparaît toute seule.
 - Visuel du hero : la baie du Mont est dessinée en SVG dans `src/components/Hero.astro` (aucune photo nécessaire).
 - Avis Google : mettre à jour `avis.note` et `avis.nombre` de temps en temps.
 - Cafés : `torrefaction` de 1 (très claire) à 5 (foncée), `notes` = 2-3 arômes.
+- `alerteVacances` : bandeau en haut du site, affiché uniquement si le texte n'est pas vide.
 
 ## Arborescence
-src/data/data.json            ← données client (seul fichier à toucher)
+src/data/site.json            ← toutes les données variables (seul fichier à toucher)
 src/layouts/Base.astro        ← <head> SEO, Open Graph
-src/components/               ← Hero, Avis, Atelier, Carte, Infos, Footer, BarreActions, Schema (JSON-LD), StatutOuverture
+src/components/               ← Hero, Avis, Atelier, Carte, Infos, Footer, BarreActions, Schema (JSON-LD), StatutOuverture, Annonce
 src/pages/index.astro         ← page unique
 src/pages/mentions-legales.astro
+src/pages/admin.astro         ← espace boutique de Laurent
+functions/api/admin/[[route]].js  ← backend de l'admin (Cloudflare Pages Function)
 
 ## À valider avec le client avant mise en ligne
 - Adresse boutique : Google indique 5 place Saint-Aubert, le RCS 3 place Saint-Aubert (siège).
 - Gamme réelle, niveaux de torréfaction et prix (les cafés actuels sont des exemples, dont les noms d'assemblage « Le Saint-Aubert » et « Grève »).
-- E-mail, n° TVA intracom, comptes Instagram/Facebook, vraie photo, nom de domaine (data.json > site.url + public/robots.txt).
+- E-mail, n° TVA intracom, comptes Instagram/Facebook, vraie photo, nom de domaine (site.json > site.url + public/robots.txt).
 
 ## Espace admin (Laurent)
 Adresse : `/admin/` (page `src/pages/admin.astro`), connexion par simple mot de passe, session de 30 jours.
-Laurent y gère : les cafés du moment (« En rayon » pour masquer un café épuisé), l'annonce du bandeau et les horaires.
+Laurent y gère : les cafés du moment (« En rayon » pour masquer un café épuisé), l'alerte/bandeau et les horaires.
+Il n'a jamais besoin d'un compte GitHub.
 
-Fonctionnement : la page appelle `netlify/functions/admin.mts` (route `/api/admin/*`), qui vérifie le mot de passe,
-puis lit/écrit uniquement `src/data/boutique/*.json` sur GitHub. Chaque enregistrement = 1 commit sur `main`
-→ Netlify republie le site (~1 min). `data.json` (mentions légales, SEO, coordonnées) n'est jamais exposé.
+Fonctionnement : la page appelle `functions/api/admin/[[route]].js` (route `/api/admin/*`, Cloudflare Pages
+Function), qui vérifie le mot de passe puis lit/écrit `src/data/site.json` sur GitHub via son API. Chaque
+enregistrement = 1 commit sur `main` → Cloudflare Pages republie le site (~30 s).
 
-Variables Netlify (Project configuration > Environment variables, portée Functions incluse) :
-- `ADMIN_PASSWORD` : mot de passe de Laurent (le changer déconnecte toutes les sessions)
-- `GITHUB_TOKEN` : jeton GitHub fine-grained, dépôt MontCafe uniquement, permission Contents : Read and write
-- `GITHUB_REPO` / `GITHUB_BRANCH` : optionnels (défauts `ReagZZZz/MontCafe` / `main`)
+## Déploiement Cloudflare Pages
+1. Sur dash.cloudflare.com → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → dépôt `ReagZZZz/montcafe`, branche `main`.
+2. Build command : `npm run build` · Build output directory : `dist`.
+3. **Settings → Environment variables** (Production **et** Preview si besoin) :
+   - `ADMIN_PASSWORD` : mot de passe de Laurent (le changer déconnecte toutes les sessions)
+   - `GITHUB_TOKEN` : jeton GitHub fine-grained, dépôt `montcafe` uniquement, permission **Contents: Read and write** — cocher « Encrypt »
+   - `GITHUB_REPO` / `GITHUB_BRANCH` : optionnels (défauts `ReagZZZz/montcafe` / `main`)
+4. Déployer. Les fonctions dans `functions/` sont détectées automatiquement par Cloudflare Pages, aucune config supplémentaire.

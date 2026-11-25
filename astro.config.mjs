@@ -1,17 +1,14 @@
-// Configuration Astro : site 100 % statique + sitemap automatique
+// Configuration Astro : site 100 % statique + sitemap automatique + Tailwind
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import data from './src/data/data.json' with { type: 'json' };
-
-// GITHUB_PAGES=1 : build pour https://reagzzzz.github.io/MontCafe/ (sous-dossier)
-// Sinon : build à la racine (Netlify ou domaine perso, URL lue dans data.json)
-const ghPages = process.env.GITHUB_PAGES === '1';
+import tailwindcss from '@tailwindcss/vite';
+import site from './src/data/site.json' with { type: 'json' };
 
 export default defineConfig({
-  site: ghPages ? 'https://reagzzzz.github.io' : data.site.url,
-  base: ghPages ? '/MontCafe/' : '/',
+  site: site.site.url,
   trailingSlash: 'always',
   output: 'static',
   integrations: [sitemap({ filter: (page) => !page.includes('/admin') })],
+  vite: { plugins: [tailwindcss()] },
   build: { inlineStylesheets: 'always' }, // CSS inliné : zéro requête bloquante
 });

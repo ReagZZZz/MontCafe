@@ -1,6 +1,6 @@
 ---
-// Espace boutique de Laurent : annonce, cafés du moment, horaires.
-// Page statique + appels à l'API /api/admin (netlify/functions/admin.mts).
+// Espace boutique de Laurent : alerte/vacances, carte, horaires.
+// Page statique + appels à l'API /api/admin (functions/api/admin/[[route]].js).
 import Base from '../layouts/Base.astro';
 ---
 <Base titre="Espace boutique – MontCafé" description="Espace d'administration MontCafé" noindex>
@@ -27,14 +27,14 @@ import Base from '../layouts/Base.astro';
     </header>
 
     <nav class="onglets" aria-label="Rubriques">
-      <button type="button" data-onglet="cafes" aria-pressed="true">Cafés</button>
-      <button type="button" data-onglet="annonce" aria-pressed="false">Annonce</button>
+      <button type="button" data-onglet="carte" aria-pressed="true">Cafés</button>
+      <button type="button" data-onglet="alerteVacances" aria-pressed="false">Alerte</button>
       <button type="button" data-onglet="horaires" aria-pressed="false">Horaires</button>
     </nav>
 
     <main class="contenu">
-      <section data-panneau="cafes"></section>
-      <section data-panneau="annonce" hidden></section>
+      <section data-panneau="carte"></section>
+      <section data-panneau="alerteVacances" hidden></section>
       <section data-panneau="horaires" hidden></section>
     </main>
 
@@ -107,10 +107,6 @@ import Base from '../layouts/Base.astro';
   .btn--danger.confirmer { background: var(--cerise); color: #fff; }
   .ajouter { width: 100%; margin-top: 12px; border-style: dashed; }
 
-  /* Choix du type d'annonce */
-  .choix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .choix button { min-height: 46px; border-radius: 6px; border: 2px solid #33231c33; background: #fff; font: 600 .92rem var(--police); cursor: pointer; }
-  .choix button[aria-pressed=true] { border-color: var(--torref); background: var(--torref); color: var(--brume); }
   .apercu { margin-top: 8px; border-radius: 6px; overflow: hidden; }
 
   /* Horaires */
@@ -137,11 +133,12 @@ import Base from '../layouts/Base.astro';
   // Logique de l'admin (aucune dépendance)
   // Les données sont gardées dans `etat`, les champs écrivent dedans,
   // et seul ce qui a changé est envoyé à l'API au moment d'enregistrer.
+  // Tout vit dans un seul fichier (site.json) côté GitHub : une seule
+  // version (sha) à suivre, mise à jour après chaque enregistrement.
   // ============================================================
   const API = '/api/admin';
   const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Foncée'];
   const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
-  const TONS = [['nouveaute', 'Nouveauté'], ['info', 'Information'], ['fermeture', 'Fermeture']];
 
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -165,13 +162,14 @@ import Base from '../layouts/Base.astro';
   }
 
   // ---------- État ----------
-  let etat = null;      // { annonce, cafes, horaires } : contenu modifiable
-  let sha = {};         // version GitHub de chaque fichier
-  let reference = {};   // JSON d'origine pour détecter les modifications
-  let ongletActif = 'cafes';
+  const SECTIONS = ['alerteVacances', 'carte', 'horaires'];
+  let etat = null;      // { alerteVacances, carte, horaires } : contenu modifiable
+  let sha = null;       // version GitHub du site.json (un seul fichier)
+  let reference = {};   // JSON d'origine, par section, pour détecter les modifications
+  let ongletActif = 'carte';
 
   const modifie = (nom) => JSON.stringify(etat[nom]) !== reference[nom];
-  const fichiersModifies = () => ['annonce', 'cafes', 'horaires'].filter(modifie);
+  const fichiersModifies = () => SECTIONS.filter(modifie);
 
   function majBarre(message, classe = '') {
     const liste = fichiersModifies();
@@ -194,9 +192,9 @@ import Base from '../layouts/Base.astro';
   // ============================================================
   // Rendu des panneaux
   // ============================================================
-  function rendreCafes() {
-    const c = etat.cafes;
-    $('[data-panneau=cafes]').innerHTML = `
+  function rendreCarte() {
+    const c = etat.carte;
+    $('[data-panneau=carte]').innerHTML = `
       <h2>Cafés du moment</h2>
       <p class="aide">Décochez « En rayon » quand un café est épuisé : il disparaît du site sans être effacé.</p>
       <div class="champ"><label for="intro">Phrase d'introduction</label>
@@ -240,35 +238,31 @@ import Base from '../layouts/Base.astro';
       </div>`;
   }
 
-  function rendreAnnonce() {
-    const a = etat.annonce;
-    $('[data-panneau=annonce]').innerHTML = `
-      <h2>Annonce</h2>
-      <p class="aide">Un bandeau en haut du site : arrivage, nouveauté, fermeture exceptionnelle…</p>
-      <label class="interrupteur"><input type="checkbox" ${a.actif ? 'checked' : ''} data-champ="annonce-actif" /> Afficher l'annonce</label>
-      <div class="champ" style="margin-top:14px"><span class="etiquette">Type</span>
-        <div class="choix">${TONS.map(([v, l]) => `<button type="button" aria-pressed="${a.ton === v}" data-action="ton" data-v="${v}">${l}</button>`).join('')}</div></div>
-      <div class="champ"><label for="txt-annonce">Texte</label>
-        <input id="txt-annonce" type="text" maxlength="160" value="${esc(a.texte)}" data-champ="annonce-texte" placeholder="Arrivage Kenya cette semaine !" /></div>
+  function rendreAlerte() {
+    const texte = etat.alerteVacances;
+    $('[data-panneau=alerteVacances]').innerHTML = `
+      <h2>Alerte / vacances</h2>
+      <p class="aide">Un bandeau en haut du site : fermeture exceptionnelle, congés, arrivage… Laissez le champ vide pour ne rien afficher.</p>
+      <div class="champ"><label for="txt-alerte">Texte du bandeau</label>
+        <input id="txt-alerte" type="text" maxlength="160" value="${esc(texte)}" placeholder="Fermé du 3 au 10 mars (congés)" /></div>
       <span class="etiquette">Aperçu</span>
-      <div class="apercu" id="apercu-annonce"></div>`;
+      <div class="apercu" id="apercu-alerte"></div>`;
+    $('#txt-alerte').addEventListener('input', (e) => { etat.alerteVacances = e.target.value; majApercu(); majBarre(); });
     majApercu();
   }
 
   function majApercu() {
-    const a = etat.annonce, el = $('#apercu-annonce');
+    const texte = etat.alerteVacances, el = $('#apercu-alerte');
     if (!el) return;
-    const couleurs = { nouveaute: ['var(--torref)', 'var(--t1)'], info: ['var(--torref)', 'var(--greve)'], fermeture: ['var(--cerise)', 'var(--brume)'] }[a.ton] || ['var(--torref)', 'var(--greve)'];
-    const label = Object.fromEntries(TONS)[a.ton] || 'Info';
-    el.innerHTML = a.actif && a.texte
-      ? `<p style="background:${couleurs[0]};color:var(--brume);padding:12px 14px"><strong style="background:${couleurs[1]};color:var(--torref);padding:1px 9px;border-radius:999px;font-size:.85rem;margin-right:8px">${esc(label)}</strong>${esc(a.texte)}</p>`
-      : `<p class="aide" style="margin:0">L'annonce n'est pas affichée sur le site.</p>`;
+    el.innerHTML = texte
+      ? `<p style="background:var(--torref);color:var(--brume);padding:12px 14px"><strong style="background:var(--t1);color:var(--torref);padding:1px 9px;border-radius:999px;font-size:.85rem;margin-right:8px">Info</strong>${esc(texte)}</p>`
+      : `<p class="aide" style="margin:0">Aucun bandeau n'est affiché sur le site.</p>`;
   }
 
   function rendreHoraires() {
     $('[data-panneau=horaires]').innerHTML = `
       <h2>Horaires</h2>
-      <p class="aide">Pour une fermeture ponctuelle (congés, jour férié), utilisez plutôt l'annonce.</p>
+      <p class="aide">Pour une fermeture ponctuelle (congés, jour férié), utilisez plutôt l'onglet Alerte.</p>
       ${JOURS.map((j) => {
         const cs = horairesEdit[j];
         return `<div class="jour">
@@ -294,16 +288,14 @@ import Base from '../layouts/Base.astro';
     const el = e.target, ch = el.dataset?.champ;
     if (!ch || !etat) return;
     const { ci, pi } = el.dataset;
-    if (ch === 'intro') etat.cafes.intro = el.value;
-    else if (ch === 'rayon') etat.cafes.categories[ci].nom = el.value;
+    if (ch === 'intro') etat.carte.intro = el.value;
+    else if (ch === 'rayon') etat.carte.categories[ci].nom = el.value;
     else if (pi !== undefined) {
-      const p = etat.cafes.categories[ci].produits[pi];
+      const p = etat.carte.categories[ci].produits[pi];
       if (ch === 'notes') p.notes = el.value.split(',').map((s) => s.trim()).filter(Boolean);
       else if (ch === 'disponible') { p.disponible = el.checked; el.closest('.carte-cafe').classList.toggle('epuise', !el.checked); }
       else { p[ch] = el.value; if (ch === 'nom') el.closest('.carte-cafe').querySelector('strong').textContent = el.value || 'Nouveau café'; }
     }
-    else if (ch === 'annonce-actif') { etat.annonce.actif = el.checked; majApercu(); }
-    else if (ch === 'annonce-texte') { etat.annonce.texte = el.value; majApercu(); }
     else if (ch === 'h') { horairesEdit[el.dataset.j][el.dataset.i][el.dataset.k] = el.value; syncHoraires(); }
     majBarre();
   });
@@ -313,7 +305,7 @@ import Base from '../layouts/Base.astro';
     if (!b || !etat) return;
     if (b.dataset.onglet) return changerOnglet(b.dataset.onglet);
     const { action, ci, pi, j, i } = b.dataset;
-    const cats = etat.cafes.categories;
+    const cats = etat.carte.categories;
 
     // Suppression en deux temps (pas de fenêtre de confirmation)
     if (action?.startsWith('suppr-rayon') || action === 'suppr-cafe') {
@@ -323,17 +315,16 @@ import Base from '../layouts/Base.astro';
         return;
       }
       if (action === 'suppr-rayon') cats.splice(ci, 1); else cats[ci].produits.splice(pi, 1);
-      rendreCafes();
+      rendreCarte();
     }
-    else if (action === 'torref') { cats[ci].produits[pi].torrefaction = b.dataset.n; rendreCafes(); }
+    else if (action === 'torref') { cats[ci].produits[pi].torrefaction = b.dataset.n; rendreCarte(); }
     else if (action === 'ajout-cafe') {
       cats[ci].produits.push({ nom: '', origine: '', notes: [], torrefaction: '3', prix: '', format: '250 g', disponible: true });
-      rendreCafes();
+      rendreCarte();
       const cartes = document.querySelectorAll(`.carte-cafe input[data-ci="${ci}"][data-champ=nom]`);
       cartes[cartes.length - 1]?.focus();
     }
-    else if (action === 'ajout-rayon') { cats.push({ nom: 'Nouveau rayon', produits: [] }); rendreCafes(); }
-    else if (action === 'ton') { etat.annonce.ton = b.dataset.v; rendreAnnonce(); }
+    else if (action === 'ajout-rayon') { cats.push({ nom: 'Nouveau rayon', produits: [] }); rendreCarte(); }
     else if (action === 'ouvert') { horairesEdit[j] = b.checked ? [['10:00', '19:00']] : []; syncHoraires(); rendreHoraires(); }
     else if (action === 'ajout-creneau') { horairesEdit[j].push(['14:00', '19:00']); syncHoraires(); rendreHoraires(); }
     else if (action === 'suppr-creneau') { horairesEdit[j].splice(i, 1); syncHoraires(); rendreHoraires(); }
@@ -348,14 +339,16 @@ import Base from '../layouts/Base.astro';
   }
 
   // ---------- Enregistrer ----------
+  // Un seul fichier GitHub (site.json) : chaque section écrite met à jour
+  // le `sha` partagé, pour que la section suivante parte de la bonne version.
   $('#enregistrer').addEventListener('click', async () => {
     const liste = fichiersModifies();
     const bouton = $('#enregistrer');
     bouton.disabled = true; majBarre('Enregistrement…');
     try {
       for (const nom of liste) {
-        const r = await appel(`/donnees/${nom}`, { method: 'PUT', body: JSON.stringify({ contenu: etat[nom], sha: sha[nom] }) });
-        sha[nom] = r.sha; etat[nom] = r.contenu; reference[nom] = JSON.stringify(r.contenu);
+        const r = await appel(`/donnees/${nom}`, { method: 'PUT', body: JSON.stringify({ contenu: etat[nom], sha }) });
+        sha = r.sha; etat[nom] = r.contenu; reference[nom] = JSON.stringify(r.contenu);
       }
       chargerHorairesEdit(); rendreTout();
       majBarre('Enregistré. Le site sera à jour dans une minute environ.', 'ok');
@@ -368,7 +361,7 @@ import Base from '../layouts/Base.astro';
 
   // ---------- Démarrage ----------
   function chargerHorairesEdit() { horairesEdit = Object.fromEntries(JOURS.map((j) => [j, versCreneaux(etat.horaires[j])])); }
-  function rendreTout() { rendreCafes(); rendreAnnonce(); rendreHoraires(); }
+  function rendreTout() { rendreCarte(); rendreAlerte(); rendreHoraires(); }
 
   function afficher(ecran) {
     $('#chargement').hidden = true;
@@ -386,11 +379,10 @@ import Base from '../layouts/Base.astro';
   async function charger() {
     try {
       const d = await appel('/donnees');
-      etat = {}; sha = {}; reference = {};
-      for (const nom of ['annonce', 'cafes', 'horaires']) {
-        etat[nom] = d[nom].contenu; sha[nom] = d[nom].sha; reference[nom] = JSON.stringify(d[nom].contenu);
-      }
-      etat.cafes.categories ??= [];
+      sha = d.sha;
+      etat = { alerteVacances: d.alerteVacances, carte: d.carte, horaires: d.horaires };
+      etat.carte.categories ??= [];
+      reference = Object.fromEntries(SECTIONS.map((nom) => [nom, JSON.stringify(etat[nom])]));
       chargerHorairesEdit(); rendreTout(); changerOnglet(ongletActif);
       afficher('admin'); majBarre();
     } catch (err) {
