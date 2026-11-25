@@ -1,5 +1,5 @@
 ---
-// Page d'accueil (one-page) : Hero → Avis → Atelier → Nos cafés → Infos pratiques → Pied de page
+// Page d'accueil (one-page) : Hero → Avis → Portrait → Atelier → Nos cafés → Infos pratiques → Pied de page
 import Base from '../layouts/Base.astro';
 import Schema from '../components/Schema.astro';
 import Annonce from '../components/Annonce.astro';
@@ -17,9 +17,9 @@ import StatutOuverture from '../components/StatutOuverture.astro';
   <Schema slot="head" />
   <Annonce />
   <Hero />
+  <Avis />
   <Portrait />
   <main>
-    <Avis />
     <Atelier />
     <Carte />
     <Infos />

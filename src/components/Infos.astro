@@ -36,11 +36,9 @@ const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
         <a href={appel}>{c.telephoneAffiche}</a>
       </address>
 
-      <!-- Carte "façade" : l'iframe Google Maps (~500 Ko) n'est chargée qu'au clic -->
-      <div class="carte" data-embed={embed}>
-        <button type="button" class="btn" data-charger-carte>
-          <Icone nom="carte" />Afficher la carte
-        </button>
+      <!-- Carte affichée directement ; loading="lazy" évite de la charger tant qu'elle n'est pas visible -->
+      <div class="carte">
+        <iframe src={embed} title="Plan d'accès" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
 
       <a class="btn btn--contour lien-itin" href={itineraire} target="_blank" rel="noopener">
@@ -57,14 +55,6 @@ const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
     </div>
   </div>
 </section>
-
-<script is:inline>
-  // Chargement de la carte uniquement à la demande (performance)
-  document.querySelector('[data-charger-carte]')?.addEventListener('click', (e) => {
-    const box = e.currentTarget.parentElement;
-    box.innerHTML = `<iframe src="${box.dataset.embed}" title="Plan d'accès" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
-  });
-</script>
 
 <style>
   .infos { background: var(--torref); color: var(--brume); }
@@ -83,14 +73,9 @@ const reseaux = Object.entries(c.reseaux).filter(([, url]) => url);
   address a { color: var(--t2); font-weight: 600; text-decoration: none; }
   .carte {
     position: relative; aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; margin: 22px 0 12px;
-    display: grid; place-items: center; background: var(--baie);
-    background-image:
-      radial-gradient(circle at 50% 48%, var(--t2) 0 9px, transparent 10px),
-      repeating-linear-gradient(0deg, transparent 0 39px, #e9ebe61f 39px 40px),
-      repeating-linear-gradient(90deg, transparent 0 39px, #e9ebe61f 39px 40px);
+    background: var(--baie);
   }
-  .carte .btn { background: var(--brume); color: var(--torref); border-color: var(--brume); margin-top: 90px; }
-  .carte :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .carte iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .lien-itin { width: 100%; color: var(--brume); border-color: var(--brume); }
   .reseaux { list-style: none; padding: 0; margin: 24px 0 0; display: flex; gap: 12px; }
   .reseaux a { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: 50%; background: #e9ebe61a; }
