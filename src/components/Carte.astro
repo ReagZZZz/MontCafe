@@ -3,6 +3,7 @@
 // Chaque café affiche son niveau de torréfaction sur l'échelle de la marque.
 import data from '../data/site.json';
 import { cafes } from '../lib/boutique.js';
+import { drapeauPays } from '../lib/drapeaux.js';
 import Icone from './Icone.astro';
 const titre = 'Nos cafés du moment';
 const { intro, categories } = cafes;
@@ -25,10 +26,12 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
 
       {categories.map((cat, i) => (
         <ul class="liste" data-i={i}>
-          {cat.produits.map((p) => (
+          {cat.produits.map((p) => {
+            const drapeau = drapeauPays(p.nom);
+            return (
             <li class="cafe">
               <div class="cafe__tete">
-                <h3>{p.nom}</h3>
+                <h3>{drapeau && <span aria-hidden="true">{drapeau} </span>}{p.nom}</h3>
                 {(prixVisible(p.prix) || p.format) && (
                   <p class="cafe__prix">{prixVisible(p.prix) && <strong>{p.prix}</strong>} {p.format}</p>
                 )}
@@ -48,7 +51,8 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
                 </div>
               )}
             </li>
-          ))}
+            );
+          })}
         </ul>
       ))}
     </div>

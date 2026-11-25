@@ -16,7 +16,7 @@ const ok = (v) => v && !String(v).startsWith('A_CONFIRMER');
     <p>
       {m.raisonSociale}, {m.formeJuridique} au capital de {m.capital}<br />
       Siège social : {m.siege}<br />
-      {m.rcs} · SIRET {m.siret}<br />
+      {m.rcs} · SIRET {m.siret}{ok(m.codeNaf) && <> · Code NAF {m.codeNaf}</>}<br />
       {ok(m.tvaIntracom) && <>TVA intracommunautaire : {m.tvaIntracom}<br /></>}
       Téléphone : <a href={`tel:${c.telephone}`}>{c.telephoneAffiche}</a>
       {ok(c.email) && <><br />E-mail : <a href={`mailto:${c.email}`}>{c.email}</a></>}
@@ -33,7 +33,7 @@ const ok = (v) => v && !String(v).startsWith('A_CONFIRMER');
     <p>L'ensemble des contenus de ce site (textes, photos, logo) est la propriété de {m.raisonSociale}, sauf mention contraire. Toute reproduction sans autorisation est interdite.</p>
 
     <h2>Données personnelles et cookies</h2>
-    <p>Ce site ne dépose aucun cookie et ne collecte aucune donnée personnelle. La carte Google Maps n'est chargée que si vous cliquez sur « Afficher la carte » ; Google peut alors déposer ses propres cookies, conformément à sa politique de confidentialité.</p>
+    <p>Ce site ne dépose aucun cookie et ne collecte aucune donnée personnelle. Une carte Google Maps est intégrée en page d'accueil pour indiquer l'emplacement de la boutique ; Google peut déposer ses propres cookies à son affichage, conformément à sa politique de confidentialité.</p>
   </main>
   <Footer />
 </Base>
