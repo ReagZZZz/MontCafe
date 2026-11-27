@@ -89,7 +89,15 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
   /* Onglet actif + liste visible (jusqu'à 6 catégories) */
   #cat-0:checked ~ .liste[data-i="0"], #cat-1:checked ~ .liste[data-i="1"],
   #cat-2:checked ~ .liste[data-i="2"], #cat-3:checked ~ .liste[data-i="3"],
-  #cat-4:checked ~ .liste[data-i="4"], #cat-5:checked ~ .liste[data-i="5"] { display: block; }
+  #cat-4:checked ~ .liste[data-i="4"], #cat-5:checked ~ .liste[data-i="5"] {
+    display: block;
+    animation: apparitionOnglet 220ms var(--ease-out);
+  }
+  @keyframes apparitionOnglet {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .onglets__barre label { transition: background 160ms var(--ease-out), color 160ms var(--ease-out); }
   #cat-0:checked ~ .onglets__barre label[for="cat-0"], #cat-1:checked ~ .onglets__barre label[for="cat-1"],
   #cat-2:checked ~ .onglets__barre label[for="cat-2"], #cat-3:checked ~ .onglets__barre label[for="cat-3"],
   #cat-4:checked ~ .onglets__barre label[for="cat-4"], #cat-5:checked ~ .onglets__barre label[for="cat-5"] {
