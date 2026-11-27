@@ -10,7 +10,6 @@ import site from '../data/site.json';
 const produitsDispo = cafes.categories.flatMap((cat) =>
   cat.produits.map((p) => ({ cle: `${cat.nom} — ${p.nom}`, format: p.format }))
 );
-const envoye = Astro.url.searchParams.get('envoye') === '1';
 ---
 <Base
   titre={`Commander à emporter – ${commerce.nom}`}
@@ -20,14 +19,25 @@ const envoye = Astro.url.searchParams.get('envoye') === '1';
     <a class="retour" href="/">← Retour au site</a>
     <h1>Commander à emporter</h1>
 
-    {envoye ? (
-      <div class="confirmation" role="status">
-        <p><strong>Commande envoyée !</strong></p>
-        <p>Je vous appelle au besoin pour confirmer le créneau de retrait. À tout de suite place Saint-Aubert.</p>
-        <a class="btn btn--contour" href="/">Retour à l'accueil</a>
-      </div>
-    ) : (
-      <>
+    <!-- Confirmation : affichée en CSS pur via l'ancre #merci (Formspree redirige ici après
+         l'envoi). Le site est statique, donc un paramètre d'URL lu au build ne marcherait pas. -->
+    <div class="confirmation" id="merci" role="status">
+      <svg class="tasse" viewBox="0 0 64 64" aria-hidden="true">
+        <defs><clipPath id="interieur-tasse"><path d="M14 24h30v14a15 15 0 0 1-15 15a15 15 0 0 1-15-15z" /></clipPath></defs>
+        <g clip-path="url(#interieur-tasse)"><rect class="tasse__cafe" x="12" y="27" width="34" height="28" fill="#6b4430" /></g>
+        <path d="M14 24h30v14a15 15 0 0 1-15 15a15 15 0 0 1-15-15z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+        <path d="M44 28h3a6 6 0 0 1 0 12h-4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+        <path d="M8 58h42" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+        <g class="tasse__vapeur" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <path d="M22 18c-3-3 2-6 0-9" /><path d="M29 18c-3-3 2-6 0-9" /><path d="M36 18c-3-3 2-6 0-9" />
+        </g>
+      </svg>
+      <p><strong>Commande envoyée !</strong></p>
+      <p>Je vous appelle au besoin pour confirmer le créneau de retrait. À tout de suite place Saint-Aubert.</p>
+      <a class="btn btn--contour" href="/">Retour à l'accueil</a>
+    </div>
+
+    <div class="zone-formulaire">
         <p class="aide">
           Choisissez vos cafés, indiquez l'heure souhaitée : je prépare votre commande pour le retrait en boutique
           (environ {site.commande.delaiRetrait}). Pas de paiement en ligne, vous réglez sur place.
@@ -35,7 +45,7 @@ const envoye = Astro.url.searchParams.get('envoye') === '1';
 
         <form class="form-commande" method="POST" action={site.commande.formulaireAction}>
           <input type="hidden" name="_subject" value={`Nouvelle commande – ${commerce.nom}`} />
-          <input type="hidden" name="_next" value={`${site.site.url}/commander/?envoye=1`} />
+          <input type="hidden" name="_next" value={`${site.site.url}/commander/#merci`} />
           <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
 
           <fieldset>
@@ -73,8 +83,7 @@ const envoye = Astro.url.searchParams.get('envoye') === '1';
 
           <button class="btn btn--plein" type="submit"><Icone nom="sac" />Envoyer ma commande</button>
         </form>
-      </>
-    )}
+    </div>
   </main>
 </Base>
 
@@ -103,7 +112,26 @@ const envoye = Astro.url.searchParams.get('envoye') === '1';
   button[type=submit] { display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; }
   button :global(svg) { width: 20px; height: 20px; }
 
-  .confirmation { background: #fff; border: 2px solid var(--vert); border-radius: 8px; padding: 24px; display: grid; gap: 10px; }
+  .confirmation { display: none; background: #fff; border: 2px solid var(--vert); border-radius: 8px; padding: 24px; gap: 10px; }
+  .confirmation:target { display: grid; }
+  .confirmation:target ~ .zone-formulaire { display: none; }
+
+  /* Tasse qui se remplit puis fume : moment rare, on peut se permettre un peu de plaisir */
+  .tasse { width: 72px; height: 72px; color: var(--torref); }
+  .tasse__cafe { transform-box: fill-box; transform-origin: 50% 100%; }
+  .tasse__vapeur path { opacity: .5; transform-box: fill-box; }
+  @media (prefers-reduced-motion: no-preference) {
+    .confirmation:target .tasse__cafe { animation: remplit 900ms var(--ease-out) 250ms both; }
+    .confirmation:target .tasse__vapeur path { opacity: 0; animation: fume 2.8s ease-in-out 1.1s infinite; }
+    .confirmation:target .tasse__vapeur path:nth-child(2) { animation-delay: 1.5s; }
+    .confirmation:target .tasse__vapeur path:nth-child(3) { animation-delay: 1.9s; }
+  }
+  @keyframes remplit { from { transform: scaleY(0); } }
+  @keyframes fume {
+    0%   { opacity: 0;  transform: translateY(3px); }
+    40%  { opacity: .8; }
+    100% { opacity: 0;  transform: translateY(-5px); }
+  }
   .confirmation strong { font-size: 1.2rem; }
 
   @media (min-width: 640px) { .choix-produits { grid-template-columns: 1fr 1fr; } }

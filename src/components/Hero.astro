@@ -40,10 +40,21 @@ const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 7
         </defs>
         <rect width="400" height="150" fill="url(#ciel)" />
         <circle cx="300" cy="62" r="20" fill="#f3efe6" />
-        <path d={mont} fill="#5e7179" />
+        <!-- Le Mont est légèrement réduit (82 %, ancré sur sa base) pour laisser de la place à la vapeur -->
+        <g transform="translate(36 27) scale(0.82)">
+          <path d={mont} fill="#5e7179" />
+        </g>
+        <!-- Le Mont fume comme une tasse de café chaud -->
+        <g class="vapeur" fill="none" stroke="#5e7179" stroke-width="2.2" stroke-linecap="round">
+          <path d="M195 29c-5-5 3-9-1-14s3-9-1-13" />
+          <path d="M201 27c5-5-3-9 1-14s-3-9 1-12" />
+          <path d="M207 29c-5-4 3-8-1-13s3-8 0-11" />
+        </g>
         <rect y="150" width="400" height="80" fill="url(#greve)" />
         <!-- Reflet dans le sable mouillé -->
-        <path d={mont} fill="#5e7179" opacity=".22" transform="translate(0 300) scale(1 -1)" />
+        <g transform="translate(36 27) scale(0.82)">
+          <path d={mont} fill="#5e7179" opacity=".22" transform="translate(0 300) scale(1 -1)" />
+        </g>
         <g stroke="#e9ebe6" stroke-width="1.4" stroke-linecap="round" opacity=".8">
           <path d="M20 166h90M160 172h140M40 186h60M250 190h120M90 204h170M10 218h80M300 214h80" />
         </g>
@@ -95,5 +106,18 @@ const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 7
     .hero__grille { grid-template-columns: 1.1fr 1fr; align-items: end; gap: 48px; }
     .hero__actions { display: flex; flex-wrap: wrap; }
     .hero__baie { margin: 0 -20px 0 0; height: 420px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%); mask-image: linear-gradient(90deg, transparent, #000 18%); }
+  }
+  /* Vapeur du Mont : 3 volutes qui montent et s'estompent en boucle, décalées.
+     Statiques et discrètes si l'appareil demande moins d'animations. */
+  .vapeur path { opacity: .3; transform-box: fill-box; transform-origin: 50% 100%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .vapeur path { opacity: 0; animation: vapeur 4.2s ease-in-out infinite; }
+    .vapeur path:nth-child(2) { animation-delay: 1.4s; }
+    .vapeur path:nth-child(3) { animation-delay: 2.8s; }
+  }
+  @keyframes vapeur {
+    0%   { opacity: 0;   transform: translateY(6px) scaleY(.7); }
+    35%  { opacity: .45; }
+    100% { opacity: 0;   transform: translateY(-10px) scaleY(1.15); }
   }
 </style>
