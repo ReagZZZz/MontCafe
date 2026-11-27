@@ -3,7 +3,7 @@
 // Chaque café affiche son niveau de torréfaction sur l'échelle de la marque.
 import data from '../data/site.json';
 import { cafes } from '../lib/boutique.js';
-import { drapeauPays } from '../lib/drapeaux.js';
+import { codePays } from '../lib/drapeaux.js';
 import Icone from './Icone.astro';
 const titre = 'Nos cafés du moment';
 const { intro, categories } = cafes;
@@ -27,11 +27,16 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
       {categories.map((cat, i) => (
         <ul class="liste" data-i={i}>
           {cat.produits.map((p) => {
-            const drapeau = drapeauPays(p.nom);
+            const code = codePays(p.nom);
             return (
             <li class="cafe">
               <div class="cafe__tete">
-                <h3>{drapeau && <span aria-hidden="true">{drapeau} </span>}{p.nom}</h3>
+                <h3>
+                  {code && (
+                    <img class="drapeau" src={`https://flagcdn.com/${code}.svg`} alt="" width="20" height="15" loading="lazy" />
+                  )}
+                  {p.nom}
+                </h3>
                 {(prixVisible(p.prix) || p.format) && (
                   <p class="cafe__prix">{prixVisible(p.prix) && <strong>{p.prix}</strong>} {p.format}</p>
                 )}
@@ -79,6 +84,7 @@ const NIVEAUX = ['', 'Très claire', 'Claire', 'Médium', 'Médium foncée', 'Fo
   .cafe { padding: 22px 0; border-bottom: 1px solid #33231c26; }
   .cafe__tete { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
   .cafe h3 { font-size: 1.75rem; font-variation-settings: "wdth" 80; letter-spacing: -0.01em; }
+  .cafe h3 :global(.drapeau) { display: inline-block; vertical-align: middle; margin-right: 8px; margin-top: -3px; border-radius: 2px; box-shadow: 0 0 0 1px #33231c26; }
   .cafe__prix { white-space: nowrap; color: var(--texte-doux); }
   .cafe__prix strong { color: var(--torref); font-size: 1.15rem; }
   .cafe__origine { color: var(--baie); font-weight: 500; margin-top: 2px; }
