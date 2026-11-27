@@ -34,7 +34,7 @@
       "facebook": "https://www.facebook.com/share/1KQyaQ8MTW/"
     }
   },
-  "alerteVacances": "Fermé",
+  "alerteVacances": "",
   "commande": {
     "delaiRetrait": "30 minutes environ",
     "formulaireAction": "https://formspree.io/f/xaeovdkn"
