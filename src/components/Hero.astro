@@ -29,16 +29,18 @@ const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 7
     </div>
 
     <figure class="hero__baie" aria-hidden="true">
-      <svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMax slice">
+      <!-- "meet" : le dessin n'est jamais rogné (vapeur comprise) ; le ciel et la grève
+           débordent du cadre pour remplir toute la largeur, jusqu'au bord de l'écran. -->
+      <svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMax meet">
         <defs>
-          <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="ciel" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="150">
             <stop offset="0" stop-color="#e9ebe6" /><stop offset="1" stop-color="#d8d0c0" />
           </linearGradient>
-          <linearGradient id="greve" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="greve" gradientUnits="userSpaceOnUse" x1="0" y1="150" x2="0" y2="230">
             <stop offset="0" stop-color="#c9c3b3" /><stop offset="1" stop-color="#b9b19e" />
           </linearGradient>
         </defs>
-        <rect width="400" height="150" fill="url(#ciel)" />
+        <rect x="-1200" y="-600" width="2800" height="750" fill="url(#ciel)" />
         <circle cx="300" cy="62" r="20" fill="#f3efe6" />
         <!-- Le Mont est légèrement réduit (82 %, ancré sur sa base) pour laisser de la place à la vapeur -->
         <g transform="translate(36 27) scale(0.82)">
@@ -50,13 +52,15 @@ const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 7
           <path d="M201 27c5-5-3-9 1-14s-3-9 1-12" />
           <path d="M207 29c-5-4 3-8-1-13s3-8 0-11" />
         </g>
-        <rect y="150" width="400" height="80" fill="url(#greve)" />
+        <rect x="-1200" y="150" width="2800" height="80" fill="url(#greve)" />
         <!-- Reflet dans le sable mouillé -->
         <g transform="translate(36 27) scale(0.82)">
           <path d={mont} fill="#5e7179" opacity=".22" transform="translate(0 300) scale(1 -1)" />
         </g>
         <g stroke="#e9ebe6" stroke-width="1.4" stroke-linecap="round" opacity=".8">
           <path d="M20 166h90M160 172h140M40 186h60M250 190h120M90 204h170M10 218h80M300 214h80" />
+          <!-- Reflets supplémentaires de part et d'autre, pour les écrans larges -->
+          <path d="M430 170h120M470 198h90M420 222h150M600 182h110M640 210h80M720 194h120M-200 176h130M-260 200h90M-150 220h120" />
         </g>
       </svg>
     </figure>
@@ -88,8 +92,14 @@ const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 7
   .hero__sous { margin-top: 12px; color: var(--texte-doux); max-width: 40ch; }
   .hero__actions { display: grid; gap: 10px; margin-top: 26px; }
 
-  .hero__baie { margin: 0 -20px; height: 230px; }
-  .hero__baie svg { width: 100%; height: 100%; }
+  /* --h : hauteur de l'illustration. Le SVG fait au moins la largeur qu'il faut pour
+     occuper toute cette hauteur (ratio 400/230), centré : le Mont garde sa taille
+     sur tous les écrans, et le décor remplit l'espace restant jusqu'au bord. */
+  .hero__baie { --h: 230px; margin: 0 -20px; height: var(--h); overflow: hidden; }
+  .hero__baie svg {
+    display: block; height: 100%; width: max(100%, calc(var(--h) * 400 / 230)); max-width: none;
+    margin-left: 50%; transform: translateX(-50%); overflow: visible;
+  }
 
   /* Signature : la bande passe du grain vert au grain torréfié, une seule fois au chargement */
   .torrefaction { display: flex; height: 18px; }
@@ -105,7 +115,8 @@ const mont = 'M96 150 L128 141 L139 124 L154 118 L159 103 L171 99 L174 84 L184 7
     .hero { padding-top: 56px; }
     .hero__grille { grid-template-columns: 1.1fr 1fr; align-items: end; gap: 48px; }
     .hero__actions { display: flex; flex-wrap: wrap; }
-    .hero__baie { margin: 0 -20px 0 0; height: 420px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%); mask-image: linear-gradient(90deg, transparent, #000 18%); }
+    /* L'image déborde du conteneur jusqu'au bord droit de l'écran */
+    .hero__baie { --h: 420px; margin: 0 calc(-20px - max(0px, (100vw - 1080px) / 2)) 0 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%); mask-image: linear-gradient(90deg, transparent, #000 18%); }
   }
   /* Vapeur du Mont : 3 volutes qui montent et s'estompent en boucle, décalées.
      Statiques et discrètes si l'appareil demande moins d'animations. */
