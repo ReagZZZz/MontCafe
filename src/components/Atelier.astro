@@ -1,31 +1,157 @@
 ---
-// L'atelier : les 4 étapes, du grain vert à la tasse.
-// C'est une vraie séquence, d'où la numérotation ; chaque pastille
-// prend la couleur de torréfaction correspondant à l'étape.
+// L'atelier, raconté comme une fournée.
+//
+// Sans JavaScript (ou si l'appareil demande moins d'animations) : la liste des
+// 4 étapes s'affiche normalement, numérotée, comme avant.
+// Avec JavaScript : la section devient une séquence épinglée à l'écran. Au fil du
+// scroll, un grain de café passe du vert au brun, un thermomètre monte de 20 à
+// 210 °C (séchage → Maillard → premier crack), le fond se réchauffe, puis le grain
+// refroidit, dégaze et finit moulu. Les 4 étapes de Laurent défilent en parallèle.
 import data from '../data/site.json';
 const { titre, etapes } = data.atelier;
 const couleurs = ['var(--t1)', 'var(--t2)', 'var(--t4)', 'var(--t5)'];
+
+// Petit tas de mouture (positions fixes, calculées une fois au build)
+const alea = (n) => { const x = Math.sin(n) * 43758.5453; return x - Math.floor(x); };
+const mouture = Array.from({ length: 140 }, (_, i) => {
+  const h = Math.sqrt(alea(i * 78.233));      // plus dense à la base
+  const demiLargeur = 92 * (1 - h * 0.9);     // le tas s'affine vers le haut
+  return {
+    x: (120 + (alea(i * 12.9898) * 2 - 1) * demiLargeur).toFixed(1),
+    y: (318 - h * 70).toFixed(1),
+    r: (3 + (i % 4) * 1.1).toFixed(1),
+    teinte: ['#4a2c1c', '#5b3826', '#3d2416'][i % 3],
+  };
+});
 ---
-<section class="section atelier" aria-labelledby="titre-atelier">
-  <div class="conteneur">
-    <h2 id="titre-atelier">{titre}</h2>
-    <ol class="etapes">
-      {etapes.map((e, i) => (
-        <li style={`--c:${couleurs[i] ?? 'var(--t5)'}`}>
-          <span class="pastille">{i + 1}</span>
-          <div>
-            <h3>{e.titre}</h3>
-            <p>{e.texte}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
+<section class="section atelier" aria-labelledby="titre-atelier" data-fournee>
+  <div class="scene">
+    <div class="conteneur atelier__grille">
+      <div class="atelier__texte">
+        <h2 id="titre-atelier">{titre}</h2>
+
+        <div class="thermo fournee-only" aria-hidden="true">
+          <p class="thermo__valeur"><span data-temp>20</span><small> °C</small></p>
+          <div class="thermo__barre"><i data-jauge></i></div>
+          <p class="thermo__phase" data-phase>Grain cru</p>
+        </div>
+
+        <ol class="etapes">
+          {etapes.map((e, i) => (
+            <li style={`--c:${couleurs[i] ?? 'var(--t5)'}`} class={i === 0 ? 'actif' : ''}>
+              <span class="pastille">{i + 1}</span>
+              <div>
+                <h3>{e.titre}</h3>
+                <p>{e.texte}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="grain-zone fournee-only" aria-hidden="true">
+        <svg viewBox="0 0 240 340">
+          <!-- Vapeur de dégazage (visible pendant le repos) -->
+          <g data-vapeurs opacity="0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
+            <path d="M100 58c-7-8 5-14-1-22s5-14-1-22" />
+            <path d="M120 54c7-8-5-14 1-22s-5-14 1-24" />
+            <path d="M140 58c-7-8 5-14-1-22s5-14-1-20" />
+          </g>
+          <!-- Le grain -->
+          <g class="grain" data-grain>
+            <ellipse data-coque cx="120" cy="170" rx="70" ry="98" fill="#a7ae7a" />
+            <ellipse cx="96" cy="128" rx="20" ry="40" fill="#fff" opacity=".16" />
+            <path d="M120 76C92 130 148 210 120 264" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="9" stroke-linecap="round" />
+            <!-- Fissures du premier crack -->
+            <g data-cracks opacity="0" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="3" stroke-linecap="round">
+              <path d="M76 142l-12 8M162 192l12 7M152 118l11-9M88 222l-11 9M158 238l8 9" />
+            </g>
+          </g>
+          <!-- La mouture -->
+          <g data-mouture opacity="0">
+            {mouture.map((m) => <circle cx={m.x} cy={m.y} r={m.r} fill={m.teinte} />)}
+          </g>
+        </svg>
+      </div>
+    </div>
   </div>
 </section>
 
+<script>
+  // Séquence "fournée" pilotée par le scroll. ~1,5 Ko, sans librairie.
+  const s = document.querySelector<HTMLElement>('[data-fournee]');
+  const reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (s && !reduit) {
+    s.classList.add('fournee-on');
+    const $ = <T extends Element>(q: string) => s.querySelector(q) as T;
+    const grain = $<SVGGElement>('[data-grain]');
+    const coque = $<SVGEllipseElement>('[data-coque]');
+    const cracks = $<SVGGElement>('[data-cracks]');
+    const vapeurs = $<SVGGElement>('[data-vapeurs]');
+    const mouture = $<SVGGElement>('[data-mouture]');
+    const temp = $<HTMLElement>('[data-temp]');
+    const jauge = $<HTMLElement>('[data-jauge]');
+    const phase = $<HTMLElement>('[data-phase]');
+    const etapes = [...s.querySelectorAll('.etapes li')];
+
+    // Échelle de torréfaction de la marque (vert → foncé) et fond froid → chaud
+    const TEINTES = [[167, 174, 122], [201, 166, 107], [169, 113, 63], [122, 74, 42], [74, 44, 28]];
+    const FROID = [233, 235, 230], CHAUD = [241, 214, 184];
+    const borne = (v: number) => Math.min(1, Math.max(0, v));
+    const mix = (a: number[], b: number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+    const teinte = (r: number) => {
+      const x = r * (TEINTES.length - 1), i = Math.min(Math.floor(x), TEINTES.length - 2);
+      return `rgb(${mix(TEINTES[i], TEINTES[i + 1], x - i)})`;
+    };
+
+    let avant = -1, enAttente = false, phaseAvant = '', etapeAvant = -1;
+
+    function maj() {
+      enAttente = false;
+      const r = s!.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;           // hors écran : rien à faire
+      const p = borne(-r.top / (r.height - innerHeight));
+      if (p === avant) return;
+      avant = p;
+
+      // Découpage de la séquence (0 → 1)
+      const torref = borne((p - 0.22) / 0.36);   // 0.22 → 0.58 : torréfaction
+      const repos = borne((p - 0.6) / 0.18);     // 0.60 → 0.78 : refroidissement / dégazage
+      const moulu = borne((p - 0.8) / 0.15);     // 0.80 → 0.95 : mouture
+      const t = p < 0.6 ? 20 + torref * 190 : 210 - repos * 190;
+
+      temp.textContent = String(Math.round(t));
+      jauge.style.transform = `scaleX(${(t - 20) / 190})`;
+      const libelle = p < 0.22 ? 'Grain cru' : p < 0.6
+        ? (t < 150 ? 'Séchage' : t < 196 ? 'Réaction de Maillard' : 'Premier crack !')
+        : p < 0.8 ? 'Refroidissement, le grain dégaze' : 'Mouture à la demande';
+      if (libelle !== phaseAvant) { phase.textContent = libelle; phaseAvant = libelle; }
+
+      coque.style.fill = teinte(torref);
+      grain.style.transform = `rotate(${-18 + p * 40}deg) scale(${(1 + torref * 0.12) * (1 - moulu * 0.45)})`;
+      grain.style.opacity = String(1 - moulu);
+      cracks.style.opacity = String((p >= 0.6 || t >= 196 ? 1 : 0) * (1 - moulu));
+      vapeurs.style.opacity = String(Math.sin(repos * Math.PI) * 0.7);
+      mouture.style.opacity = String(moulu);
+      mouture.style.transform = `translateY(${(1 - moulu) * 14}px)`;
+      s!.style.backgroundColor = `rgb(${mix(FROID, CHAUD, (t - 20) / 190)})`;
+
+      const k = p < 0.22 ? 0 : p < 0.6 ? 1 : p < 0.8 ? 2 : 3;
+      if (k !== etapeAvant) { etapes.forEach((li, i) => li.classList.toggle('actif', i === k)); etapeAvant = k; }
+    }
+
+    const demander = () => { if (!enAttente) { enAttente = true; requestAnimationFrame(maj); } };
+    addEventListener('scroll', demander, { passive: true });
+    addEventListener('resize', () => { avant = -1; demander(); });
+    maj();
+  }
+</script>
+
 <style>
+  /* ---------- Version de base : liste numérotée (sans JS / animations réduites) ---------- */
+  .fournee-only { display: none; }
   .etapes { list-style: none; padding: 0; margin: 36px 0 0; position: relative; }
-  /* Fil vertical qui relie les étapes */
   .etapes::before {
     content: ""; position: absolute; left: 21px; top: 22px; bottom: 22px; width: 2px;
     background: linear-gradient(var(--t1), var(--t5));
@@ -46,5 +172,57 @@ const couleurs = ['var(--t1)', 'var(--t2)', 'var(--t4)', 'var(--t5)'];
     .etapes::before { left: 22px; right: 22px; top: 21px; bottom: auto; width: auto; height: 2px; background: linear-gradient(90deg, var(--t1), var(--t5)); }
     .etapes li { grid-template-columns: 1fr; gap: 14px; padding: 0; }
     h3 { padding-top: 0; }
+  }
+
+  /* ---------- Version "fournée" (activée par le script) ---------- */
+  .fournee-on { height: 320vh; padding: 0; }
+  .fournee-on .fournee-only { display: block; }
+  .fournee-on .scene { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+
+  /* Mobile : titre, grain, thermomètre, étape (empilés dans l'écran) */
+  .fournee-on .atelier__grille {
+    display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 10px;
+    height: 100%; padding-top: 56px; padding-bottom: 104px; /* la barre d'actions mobile est en bas */
+  }
+  .fournee-on .atelier__texte { display: contents; }
+  .fournee-on h2 { order: 1; font-size: clamp(1.9rem, 7vw, 3rem); }
+  .fournee-on .grain-zone { order: 2; min-height: 0; color: var(--baie); }
+  .fournee-on .thermo { order: 3; }
+  .fournee-on .etapes { order: 4; }
+  .grain-zone svg { display: block; height: 100%; width: 100%; overflow: visible; }
+  .grain { transform-box: fill-box; transform-origin: center; }
+  [data-mouture] { transform-box: fill-box; }
+
+  .thermo__valeur {
+    font-size: clamp(3rem, 13vw, 6rem); font-weight: 800; line-height: .95; letter-spacing: -0.03em;
+    font-variation-settings: "wdth" 75; font-variant-numeric: tabular-nums;
+  }
+  .thermo__valeur small { font-size: .42em; font-weight: 600; letter-spacing: 0; }
+  .thermo__barre { height: 6px; max-width: 360px; margin-top: 10px; border-radius: 3px; background: #33231c1a; overflow: hidden; }
+  .thermo__barre i { display: block; height: 100%; background: linear-gradient(90deg, var(--t2), var(--cerise)); transform: scaleX(0); transform-origin: left; }
+  .thermo__phase { margin-top: 8px; font-weight: 600; color: var(--baie); }
+
+  /* Une seule étape visible à la fois, qui glisse en place */
+  .fournee-on .etapes { display: block; margin: 6px 0 0; min-height: 7.2em; }
+  .fournee-on .etapes::before { display: none; }
+  .fournee-on .etapes li {
+    position: absolute; inset: 0 0 auto 0; padding: 0; grid-template-columns: 44px 1fr; gap: 16px;
+    opacity: 0; transform: translateY(14px);
+    transition: opacity 220ms ease, transform 420ms var(--ease-out);
+  }
+  .fournee-on .etapes li.actif { opacity: 1; transform: none; }
+  .fournee-on .pastille { box-shadow: none; }
+  .fournee-on h3 { padding-top: 9px; }
+
+  @media (min-width: 900px) {
+    .fournee-on { height: 360vh; }
+    .fournee-on .atelier__grille {
+      grid-template-columns: 1.05fr 1fr; grid-template-rows: none; align-items: center; gap: 48px;
+      padding-top: 0; padding-bottom: 0;
+    }
+    .fournee-on .atelier__texte { display: block; }
+    .fournee-on .thermo { margin-top: 28px; }
+    .fournee-on .etapes { margin-top: 28px; }
+    .fournee-on .grain-zone { height: min(68svh, 560px); }
   }
 </style>

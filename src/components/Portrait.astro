@@ -36,4 +36,24 @@ const c = data.commerce;
   @media (min-width: 900px) {
     .portrait__grille { grid-template-columns: 1fr 1fr; gap: 48px; }
   }
+  /* La photo s'ouvre comme un rideau à son arrivée, avec une légère profondeur
+     (scroll-driven CSS ; statique sur les navigateurs qui ne le gèrent pas). */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .portrait__photo :global(img) {
+        scale: 1.12;
+        animation: rideau linear both, profondeur linear both;
+        animation-timeline: view(), view();
+        animation-range: entry 0% cover 45%, normal;
+      }
+    }
+  }
+  @keyframes rideau {
+    from { clip-path: inset(20% 12% 20% 12% round 10px); }
+    to   { clip-path: inset(0 round 10px); }
+  }
+  @keyframes profondeur {
+    from { translate: 0 -5%; }
+    to   { translate: 0 5%; }
+  }
 </style>

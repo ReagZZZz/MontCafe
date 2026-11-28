@@ -1,0 +1,15 @@
+---
+// Les titres de section glissent en place la première fois qu'ils arrivent à
+// l'écran. Seuls les titres encore sous la ligne de flottaison au chargement
+// sont concernés (aucun clignotement pour ce qui est déjà visible).
+---
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entrees) => {
+      for (const e of entrees) if (e.isIntersecting) { e.target.classList.add('vu'); io.unobserve(e.target); }
+    }, { rootMargin: '0px 0px -12% 0px' });
+    document.querySelectorAll('main h2, .portrait h2').forEach((h) => {
+      if (h.getBoundingClientRect().top > innerHeight * 0.9) { h.classList.add('a-venir'); io.observe(h); }
+    });
+  }
+</script>

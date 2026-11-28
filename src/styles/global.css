@@ -100,6 +100,10 @@ p { margin: 0; }
 .echelle i:nth-child(5) { --c: var(--t5); }
 .echelle i.on { background: var(--c); opacity: 1; }
 
+/* ---------- Apparition des titres (classe posée par Apparitions.astro) ---------- */
+h2.a-venir { opacity: 0; transform: translateY(18px); transition: opacity 600ms var(--ease-out), transform 700ms var(--ease-out); }
+h2.a-venir.vu { opacity: 1; transform: none; }
+
 @media (min-width: 768px) {
   body { padding-bottom: 0; }
   .section { padding: 104px 0; }

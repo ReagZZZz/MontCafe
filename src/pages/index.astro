@@ -1,11 +1,13 @@
 ---
-// Page d'accueil (one-page) : Hero → Avis → Portrait → Atelier → Nos cafés → Infos pratiques → Pied de page
+// Page d'accueil (one-page) : Hero → Avis → Portrait → Atelier (fournée) → Bandeau de notes → Nos cafés → Infos pratiques → Pied de page
 import Base from '../layouts/Base.astro';
 import Schema from '../components/Schema.astro';
 import Annonce from '../components/Annonce.astro';
 import Hero from '../components/Hero.astro';
 import Portrait from '../components/Portrait.astro';
 import Atelier from '../components/Atelier.astro';
+import Bandeau from '../components/Bandeau.astro';
+import Apparitions from '../components/Apparitions.astro';
 import Avis from '../components/Avis.astro';
 import Carte from '../components/Carte.astro';
 import Infos from '../components/Infos.astro';
@@ -21,10 +23,12 @@ import StatutOuverture from '../components/StatutOuverture.astro';
   <Portrait />
   <main>
     <Atelier />
+    <Bandeau />
     <Carte />
     <Infos />
   </main>
   <Footer />
   <BarreActions />
   <StatutOuverture />
+  <Apparitions />
 </Base>

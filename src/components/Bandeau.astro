@@ -1,0 +1,43 @@
+---
+// Bandeau de notes de dégustation qui défile en continu.
+// Généré à partir des cafés disponibles (site.json) : quand Laurent change sa
+// gamme dans l'admin, le bandeau suit tout seul. Décoratif → caché aux lecteurs
+// d'écran (les notes sont déjà lisibles dans "Nos cafés").
+import { cafes } from '../lib/boutique.js';
+const notes = [...new Set(
+  cafes.categories.flatMap((c) => c.produits.filter((p) => p.disponible !== false).flatMap((p) => p.notes ?? []))
+)];
+---
+{notes.length > 0 && (
+  <div class="bandeau" aria-hidden="true">
+    <div class="piste">
+      {[0, 1].map(() => (
+        <ul>{notes.map((n) => <li>{n}</li>)}</ul>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .bandeau { background: var(--torref); color: var(--brume); overflow: hidden; padding: 20px 0; }
+  /* Deux copies identiques côte à côte : décaler de -50 % boucle sans à-coup */
+  .piste { display: flex; width: max-content; }
+  .piste ul { display: flex; list-style: none; margin: 0; padding: 0; }
+  .piste li {
+    display: flex; align-items: center; white-space: nowrap;
+    font-size: clamp(1.4rem, 4.5vw, 2.1rem); font-weight: 600; font-variation-settings: "wdth" 78;
+  }
+  /* Séparateur en grain de café */
+  .piste li::after {
+    content: ""; width: 12px; height: 17px; margin: 0 28px; border-radius: 50%; transform: rotate(-25deg);
+    background-color: var(--t2);
+    background-image: linear-gradient(90deg, transparent 42%, #0006 43% 57%, transparent 58%);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .piste { animation: defile 50s linear infinite; }
+    @media (hover: hover) and (pointer: fine) {
+      .bandeau:hover .piste { animation-play-state: paused; }
+    }
+  }
+  @keyframes defile { to { transform: translateX(-50%); } }
+</style>
